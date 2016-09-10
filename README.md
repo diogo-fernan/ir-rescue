@@ -151,7 +151,7 @@ yara=false
 
 * **Cygwin**: the [Cygwin](http://www.cygwin.com/ "Cygwin Web Site") project is open-source and is used by *ir-rescue* only to cut out non-printable characters via the `tr.exe` utility.
 
-* **The Sleuth Kit (TSK)**: the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is a forensic tool to analyze hard drives at the file system level, used by *ir-rescue* only to walk the MFT with `fls.exe`.
+* **The Sleuth Kit (TSK)**: the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is an open-source forensic tool to analyze hard drives at the file system level, used by *ir-rescue* only to walk the MFT with `fls.exe`.
 
 * **7za.exe**: [7-Zip](http://www.7-zip.org/) is an open-source compression utility developed by Igor Pavlov and release under the GNU LGPL license.
 
@@ -161,4 +161,4 @@ yara=false
 
 * **densityscout.exe**: the [DensityScout](https://www.cert.at/downloads/software/densityscout_en.html "DensityScout Web Site") utility was written by Christian Wojner and is released under the ISC license. 
 
-* **YARA**: [YARA](http://virustotal.github.io/yara/ "Yara Web Site") is a signature scheme for malware that can be used to perform scans of specific indicators.
+* **YARA**: [YARA](http://virustotal.github.io/yara/ "Yara Web Site") is an open-source signature scheme for malware that can be used to perform scans of specific indicators.
