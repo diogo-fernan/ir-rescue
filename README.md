@@ -81,7 +81,7 @@ Some tools that perform recursive searches or scans are set only to recurse on s
 In turn, the following folders are set for **non-recursive search**:
 
 * `C:\Windows\system(32|64)`;
-* `C:\Windows\system(32|64)\drivers`;
+* `C:\Windows\system(32|64)\drivers`.
 
 During runtime, all characters printed to the Standard Output (`STDOUT`) and Standard Error (`STDERR`) channels are logged to UTF-8 encoded text files. This means that the output of tools are stored in corresponding folders and text files. Status ASCII messages are still printed to the console in order to check the execution progress. After collection, data is compressed into a password-protected archive and is accordingly deleted afterwards, if set to do so. The password of the resulting encrypted archive is "infected" without quotes.
 
