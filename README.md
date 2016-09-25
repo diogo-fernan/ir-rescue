@@ -1,32 +1,38 @@
 # ir-rescue
 
-*ir-rescue* is a Windows Batch script that collects a myriad of **forensic data** from 32-bit and 64-bit Windows systems while respecting the order of volatility. It is intended for **incident response** use at different stages in the analysis and investigation process. It can be set to perform comprehensive collections of data for triage purposes, as well as customized acquisitions of specific types of data. The tool represents an effort to streamline host data collection, regardless of investigation needs, and to rely less on on-site support when remote access or live analysis is unavailable.
+*ir-rescue* is a lightweight Windows Batch script that collects a myriad of **forensic data** from 32-bit and 64-bit Windows systems while respecting the order of volatility and artifacts that are changed with the execution of the script (*e.g.*, prefetch files). It is intended for **incident response** use at different stages in the analysis and investigation process. It can be set to perform comprehensive collections of data for triage purposes, as well as customized acquisitions of specific types of data. The tool represents an effort to streamline host data collection, regardless of investigation needs, and to rely less on on-site support when remote access or live analysis is unavailable.
 
-*ir-rescue* makes use of built-in Windows commands and well-known third party utilities from Sysinternals and NirSoft, for instance, some being open-source. It is designed to group data collections according to data type. For example, all data that relates to networking, such as open file shares and TCP connections, is grouped together, while running processes, services and tasks are gathered under malware. The tool is also purposefully designed not to make use of PowerShell and WMI in order to make it transversally compatible. The acquisition of data types and other general options are specified in a simple **configuration file**. It should be noted that the tool launches a great number of commands and tools, thereby leaving a considerable **footprint** on the system. The runtime varies depending on the computation power and configurations set, though it usually finishes within a maximum of one hour if configured to run fully.
+*ir-rescue* makes use of built-in Windows commands and well-known third party utilities from Sysinternals and NirSoft, for instance, some being open-source. It is designed to group data collections according to data type. For example, all data that relates to networking, such as open file shares and Transmission Control Protocol (TCP) connections, is grouped together, while running processes, services and tasks are gathered under malware. The tool is also purposefully designed not to make use of PowerShell and Windows Management Instrumentation (WMI) in order to make it transversally compatible. The acquisition of data types and other general options are specified in a simple **configuration file**. It should be noted that the script launches a great number of commands and tools, thereby leaving a considerable **footprint** (*e.g.*, prefetch files) on the system. The runtime varies depending on the computation power and configurations set, though it usually finishes within a maximum of one hour if configured to run fully.
 
 *ir-rescue* has been written for incident response and forensic analysts, as well as for security practitioners alike. It can thus be used for leveraging the already bundled tools and commands during forensic activities.
 
 # Dependencies and Usage
 
-*ir-rescue* relies on a number of third-party utilities for gathering specific data from hosts. The latest versions of the tools, as of this writing, are provided with the package as is. Their descriptions and organization in the **folder tree** structure are given below, with both 32-bit and 64-bit versions of the tools included adjacently, if applicable:
+*ir-rescue* relies on a number of third-party utilities for gathering specific data from hosts. The versions of the tools are listed in the next section and are provided with the package as is and, therefore, their licenses and user agreements must be accepted before running *ir-rescue*. Their descriptions and organization in the **folder tree** structure are given below, with both 32-bit and 64-bit versions of the tools included adjacently, if applicable:
 
-* `tools\`: third-party tools folder:
+* `tools-win\`: third-party tools folder:
 	* `ascii\`: text ASCII art files in `*.txt` format;
 	* `cfg\`: configuration files:
 		* `ir-rescue.conf`: main configuration file;
-		* `c.txt`: `md5deep` interesting hashing locations of the `C:\` drive;
-		* `sys.txt`: `md5deep` hashing locations of the `C:\Windows\system(32|64)` folders;
+		* `nonrecursive-(acl|iconsext|md5deep).txt`: `accesschk[64].exe`, `iconsext.exe` and `md5deep[64].exe` non-recursive locations;
+		* `nonrecursive.txt`: non-recursive locations for multiple tools;
+		* `recursive-(acl|iconsext|md5deep).txt`: `accesschk[64].exe`, `iconsext.exe` and `md5deep[64].exe` recursive locations;
+		* `recursive.txt`: recursive locations for multiple tools;
 	* `cygwin\`: Cygwin tools and Dynamic Linked Libraries (DLLs):
 		* `tr.exe`: used to cut out non-printable characters;
+		* `grep.exe`: used to filter date with regular expressions;
 	* `evt\`: Windows events tools:
 		* `psloglist.exe`;
 	* `fs\`: filesystem tools:
 		* `tsk\`: The Sleuth Kit (TSK) tools and DLLs:
 			* `fls.exe`: walks the Master File Table (MFT);
 		* `AlternateStreamView[64].exe`: lists Alternate Data Streams (ADSs);
+		* `ExtractUsnJrnl[64].exe`: extracts the `C:\$Extend\$UsnJrnl` (NTFS journal) file without the sparsed zeroes;
 		* `md5deep[64].exe`: computes Message Digest 5 (MD5) hash values;
 		* `ntfsinfo[64].exe`: shows information about NTFS;
+		* `RawCopy[64].exe`: extracts data at the NTFS level;
 	* `mal\`: malware tools:
+		* `autoruns[64].exe`: dumps autorun locations to the autoruns binary format;
 		* `autorunsc[64].exe`: lists autorun locations;
 		* `densityscout[64].exe`: computes an entropy-based measure for detecting packers and encryptors;
 		* `DriverView[64].exe`: lists loaded kernel drivers;
@@ -62,103 +68,103 @@
 		* `yara(32|64).exe`: YARA main executable;
 		* `yarac(32|64).exe`: YARA rules compiler;
 	* `7za.exe`: compresses files and folders;
+	* `screenshot-cmd.exe`: takes screenshots;
 	* `sdelete(32|64).exe`: securely deletes files and folders;
 * `data\`: data folder created during runtime with the collected data:
 	* `<HOSTNAME>-<DATE>\`: `<DATE>` follows the `YYYYMMDD` format:
-		* `ir-rescue.log`: verbose log file of status messages;
+		* `ir-rescue`\: folder for `ir-rescue`-related data
+			* `ir-rescue.log`: verbose log file of status messages;
+			* `screenshot-#`: numbered screenshots;
 		* folders named according to the data type set for collection.
 
 `ir-rescue` needs to be run under a command line console with **administrator rights** and requires no arguments. It makes use of a configuration file to set desired options. As such, executing the script simply needs the issuing of the Batch file as follows:
 
 * `ir-rescue.bat`
 
-Some tools that perform recursive searches or scans are set only to recurse on specific folders. This makes the data collection more targeted while taking into account run time performance as the folders specified are likely locations for analysis due to extensive use by malware. The folders set for **recursive search** are the following:
+Some tools that perform recursive searches or scans are set only to recurse on specific folders. This makes the data collection more targeted while taking into account run time performance as the folders specified are likely locations for analysis due to extensive use by malware. By default, the locations set in `tools-win\cfg\recursive.txt` for **recursive search** are the following:
 
 * `C:\Users`;
 * `C:\ProgramData`;
-* `C:\Windows\Temp`.
+* `C:\Windows\Temp`;
+* `D:`.
 
-In turn, the following folders are set for **non-recursive search**:
+In turn, the locations also set in `tools-win\cfg\nonrecursive.txt` for **non-recursive search** are the following:
 
 * `C:\Windows\system(32|64)`;
 * `C:\Windows\system(32|64)\drivers`.
 
-During runtime, all characters printed to the Standard Output (`STDOUT`) and Standard Error (`STDERR`) channels are logged to UTF-8 encoded text files. This means that the output of tools are stored in corresponding folders and text files. Status ASCII messages are still printed to the console in order to check the execution progress. After collection, data is compressed into a password-protected archive and is accordingly deleted afterwards, if set to do so. The password of the resulting encrypted archive is "infected" without quotes.
+Some of the tools have dedicated files with specific locations to and not to recurse. These are also kept under `tools-win\cfg\` and are named `recursive-<tool>.txt` and `nonrecursive-<tool>.txt`, with `<tool>` being changed to the tool name. All these files can be changed with the desired locations for analysis. Each file must have one **location as full path** per line.
+
+During runtime, all characters printed to the Standard Output (`STDOUT`) and Standard Error (`STDERR`) channels are logged to UTF-8 encoded text files. This means that the output of tools are stored in corresponding folders and text files. Status ASCII messages are still printed to the console in order to check the execution progress. After collection, data can be compressed into a password-protected archive and accordingly deleted afterwards, if set to do so. The password of the resulting encrypted archive is, by default, "infected" without quotes.
 
 # Configuration File
 
-The configuration file is composed of simple binary directives (`true` or `false`) for the general behaviour of the script, for which data types to collect and for which advanced tools to run. The supported general directives are explained as follows:
+The configuration file is composed of simple binary directives (`true` or `false`) for the general behaviour of the script, for which data types to collect and for which advanced tools to run. Lines preceded by a pound sign are considered comments. These are used to briefly describe what each option does, to enumerate folders, files or registry keys important to provide some context, as well as to list relevant tools.
 
-* `killself`: this option directs the script to delete the the `tools` and `data` folder upon finishing, as well as deleting the Batch script itself;
-* `sdelete`: this option activates the use of `sdelete.exe` (secure delete) in favour of the Windows built-in `del` and `rmdir`;
-* `zip`: this option sets the compression of the resulting data folder;
-* `ascii`: this option sets the printing of fun ASCII art upon completion.
-
-Data is grouped into the types given by the following directives:
+Essentially, data is grouped into the types given by the following directives:
 
 * `memory`: this options sets the collection of the memory;
-* `registry`: this option sets the export of all registry hives, including user hives listed in `HKU\`;
-* `events`: this option sets the export of Windows event logs;
+* `registry`: this option sets the collection of system and user registry;
+* `events`: this option sets the collection of Windows event logs;
 * `system`: this option sets the collection of system-related information;
-* `network`: this option sets the collection of networking data;
-* `filesystem`: this option sets the collection of data related with NTFS and files; 
+* `network`: this option sets the collection of network data;
+* `filesystem`: this option sets the collection of data related with NTFS and files;
 * `malware`: this option sets the collection of system data that can be used to spot malware;
 * `web`: this option sets the collection of browsing history and caches;
-* `misc`: this option sets the collection of USB device usage and Microsoft Office add-ins.
+* `misc`: this option sets the collection of miscellaneous data that does not quite fit other options.
 
-On the one hand, the usage of advanced tools set by the `sigcheck`, `density`, `iconext` and `yara` options is independent of the configurations made to the collection of data types. On the other hand, directives under submodules are tied to their respective main options. For example, `filesystem-simple` instructs the tool to run a simpler filesystem analysis focused on file listing, skipping the MFT walk, the computation of MD5 values, and the listing of ADSs. This option is disregarded if `filesystem` is set to `false`.
+On the one hand, the usage of advanced tools set by the `sigcheck`, `density`, `iconsext` and `yara` options is independent of the configurations made to the collection of data types. On the other hand, directives under the respective main options of the data types are tied to them, meaning that they are disregarded if the main ones are set to `false`. For example, `memory-dump=true`, the option that instructs the tool to dump the Random Access Memory (RAM), is ignored if `memory=false`. The same goes for the `<option>-all` option, which sets all options of a certain data type to `true` for convenience. All options not found or commented in the configuration file are set to `false` during runtime.
 
-Note that the `iconext` option is useful to look for binaries compiled with unusual frameworks that set PE icons (*e.g.*, Python). Moreover, YARA rules need to have a `*.yar` file extension and to be put in the `tools\yara\rules\` folder. The output of all advanced tools are stored under the `malware` resulting folder.
+Note that the `iconsext` option is useful to look for binaries compiled with unusual frameworks that set PE icons (*e.g.*, Python). Moreover, YARA rules need to have a `*.yar` file extension and to be put in the `tools-win\yara\rules\` folder. The output of all advanced tools are stored under the `malware` resulting folder.
 
-Below is a working example of the configuration file setting the collection of the memory, registry and Windows event logs, as well as the compression of the final data folder. 
+Below is a minimal example of the configuration file setting the collection of the RAM, system registry and Windows event logs in text format, as well as the compression of the final data folder with password "infected" (without quotes). 
 
 ```
-# ir-rescue configuration file
+# ir-rescue-win configuration file
 # accepted values: 'true' or 'false' (exclusive)
 
 # general
 killself=false
 sdelete=false
 zip=true
+zpassword=infected
 ascii=false
 
 # modules
 memory=true
 registry=true
 events=true
-system=false
-network=false
-filesystem=false
-malware=false
-web=false
-misc=false
 
-# submodules
-filesystem-simple=false
+# memory 
+memory-dump=true
 
-# advanced
-sigcheck=false
-density=false
-iconext=false
-yara=false
+# registry
+registry-system=true
+
+# events
+events-txt=true
 ```
 
 # Third-Party Tool List and References
 
-* **Sysinternals**: the [Sysinternals](https://technet.microsoft.com/en-us/sysinternals/ "Sysinternals Web Site") tools have been mostly developed by Mark Russinovich and are free to use under the [Sysinternals Software License Terms](https://technet.microsoft.com/en-us/sysinternals/bb469936.aspx "Sysinternals Software License Terms"). The full list of tools used by *ir-rescue* is `accesschk.exe`, `autorunsc.exe`, `handle.exe`, `Listdlls.exe`, `logonsessions.exe`, `ntfsinfo.exe`, `psfile.exe`, `PsGetsid.exe`, `Psinfo.exe`, `pslist.exe`, `psloggedon.exe`, `psloglist.exe`, `PsService.exe`, `sdelete.exe`, `sigcheck.exe`, and `tcpvcon.exe`.
+* **Sysinternals**: the [Sysinternals](https://technet.microsoft.com/en-us/sysinternals/ "Sysinternals Web Site") tools have been mostly developed by Mark Russinovich and are free to use under the [Sysinternals Software License Terms](https://technet.microsoft.com/en-us/sysinternals/bb469936.aspx "Sysinternals Software License Terms"). The full list of tools used by *ir-rescue* is `accesschk[64].exe` (v6.02), `autoruns[64].exe` (v13.62), `autorunsc[64].exe` (v13.61), `handle[64].exe` (v4.1), `Listdlls[64].exe` (v3.2), `logonsessions[64].exe` (v1.4), `ntfsinfo[64].exe` (v1.2), `psfile[64].exe` (v1.03), `PsGetsid[64].exe` (v1.45), `Psinfo[64].exe` (v1.78), `pslist[64].exe` (v1.4), `psloggedon[64].exe` (v1.35), `psloglist.exe` (v2.71), `PsService[64].exe` (v2.25), `sdelete(32|64).exe` (v2.0), `sigcheck[64].exe` (v2.52), and `tcpvcon.exe` (v3.01).
 
-* **NirSoft**: the [NirSoft](http://www.nirsoft.net/ "NirSoft Web Site") suite of tools are developed by Nir Sofer and are released as freeware utilities. The full list of tools used by *ir-rescue* is `AlternateStreamView.exe`, `BrowsingHistoryView.exe`, `ChromeCacheView.exe`, `DriverView.exe`, `iconsext.exe`, `IECacheView.exe`, `LastActivityView.exe`, `MozillaCacheView.exe`, `OfficeIns.exe`, `USBDeview.exe`, and `WinPrefetchView.exe`.
+* **NirSoft**: the [NirSoft](http://www.nirsoft.net/ "NirSoft Web Site") suite of tools are developed by Nir Sofer and are released as freeware utilities. The full list of tools used by *ir-rescue* is `AlternateStreamView[64].exe` (v1.51), `BrowsingHistoryView[64].exe` (v1.86), `ChromeCacheView.exe` (v1.67), `DriverView[64].exe` (v1.47), `iconsext.exe` (v1.47), `IECacheView.exe` (v1.58), `LastActivityView.exe` (v1.16), `MozillaCacheView.exe` (v1.69), `OfficeIns[64].exe` (v1.20), `USBDeview[64].exe` (v2.61), and `WinPrefetchView[64].exe` (v1.35).
 
-* **Cygwin**: the [Cygwin](http://www.cygwin.com/ "Cygwin Web Site") project is open-source and is used by *ir-rescue* only to cut out non-printable characters via the `tr.exe` utility.
+* **Cygwin**: the [Cygwin](http://www.cygwin.com/ "Cygwin Web Site") project is open-source and is used by *ir-rescue* only to filter outputs with the `tr.exe` (v8.24-3) and `grep.exe` (v2.21) utilities, using the 32-bit DLLs.
 
-* **The Sleuth Kit (TSK)**: the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is an open-source forensic tool to analyze hard drives at the file system level, used by *ir-rescue* only to walk the MFT with `fls.exe`.
+* **The Sleuth Kit (TSK)** (v4.3.0): the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is an open-source forensic tool to analyze hard drives at the file system level, used by *ir-rescue* only to walk the MFT with `fls.exe`.
 
-* **7za.exe**: [7-Zip](http://www.7-zip.org/) is an open-source compression utility developed by Igor Pavlov and release under the GNU LGPL license.
+* **7za.exe** (v9.20): [7-Zip](http://www.7-zip.org/) is an open-source compression utility developed by Igor Pavlov and release under the GNU LGPL license.
 
-* **winpmem_1.6.2**: the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue* to dump the memory.
+* **winpmem_1.6.2** (v1.6.2): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue* to dump the memory.
 
-* **md5deep.exe**: the [md5deep](http://md5deep.sourceforge.net/ "md5deep Web Site") utility is open-source and is maintained by Jesse Kornblum.
+* **md5deep[64].exe** (v4.4): the [md5deep](http://md5deep.sourceforge.net/ "md5deep Web Site") utility is open-source and is maintained by Jesse Kornblum.
 
-* **densityscout.exe**: the [DensityScout](https://www.cert.at/downloads/software/densityscout_en.html "DensityScout Web Site") utility was written by Christian Wojner and is released under the ISC license. 
+* **RawCopy[64].exe** (v1.0.0.15) and **ExtractUsnJrnl[64].exe** (v1.0.0.3): [RawCopy](https://github.com/jschicht/RawCopy "RawCopy GitHub Repository") (essentially, a combination of **ifind** and **icat** from TSK) and [ExtractUsnJrnl](https://github.com/jschicht/ExtractUsnJrnl "ExtractUsnJrnl GitHub Repository") are open-source NTFS utilities to extract data and special files developed by Joakim Schicht.
 
-* **YARA**: [YARA](http://virustotal.github.io/yara/ "Yara Web Site") is an open-source signature scheme for malware that can be used to perform scans of specific indicators.
+* **densityscout[64].exe** (build 45): the [DensityScout](https://www.cert.at/downloads/software/densityscout_en.html "DensityScout Web Site") utility to compute entropy was written by Christian Wojner and is released under the ISC license. 
+
+* **YARA** (v3.5.0): [YARA](http://virustotal.github.io/yara/ "Yara Web Site") is an open-source signature scheme for malware that can be used to perform scans of specific indicators.
+
+* **screenshot-cmd.exe**: [screenshot-cmd](https://code.google.com/archive/p/screenshot-cmd/) is an open-source utility released under the BSD-3 license to take screenshots.

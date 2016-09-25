@@ -1,0 +1,5 @@
+%SystemDrive%\Users
+%SystemRoot%
+%SystemRoot%\system32
+%SystemRoot%\syswow64
+D:\Users
