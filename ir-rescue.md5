@@ -1,13 +1,20 @@
-     38218  c6b22f7f90c796c87327b9169cbb44d7  ir-rescue\ir-rescue-win-v1.2.bat
+     53569  54bff913065e27f676fcb6fc0b343fbf  ir-rescue\ir-rescue-win-v1.3.bat
          0  d41d8cd98f00b204e9800998ecf8427e  ir-rescue\ir-rescue.md5
-     14404  ac3dbc3432880f1473a64c6ccba27d9d  ir-rescue\README.md
+     16044  2b0a5ba9b2781b343e55e501568a93d6  ir-rescue\README.md
+    587776  42badc1d2f03a8b1e4875740d3d49336  ir-rescue\tools-win\7za.exe
+   1490432  8e9279bc6a08b770ae40e238f5e5d262  ir-rescue\tools-win\activ\JLECmd.exe
+    115408  0918459b7c0527ae8d1a7ba760c5cbb8  ir-rescue\tools-win\activ\LastActivityView.exe
+   1443328  777bd5712c0687ae69ee84677d0050da  ir-rescue\tools-win\activ\LECmd.exe
+   1919889  1d9024c332b955bd4685a33421edd63d  ir-rescue\tools-win\activ\rifiuti-vista.exe
+   1847364  8e766ff9dd14b8583d6fba350be6c8bf  ir-rescue\tools-win\activ\rifiuti-vista64.exe
+     70352  2ec5ee49e81e1892aedc9bc239906ee8  ir-rescue\tools-win\activ\USBDeview.exe
+    179408  87717fea58960ec3077148b80131c395  ir-rescue\tools-win\activ\USBDeview64.exe
       1217  7ac576d4282de436cc860d861fd45cc4  ir-rescue\tools-win\ascii\cyb.txt
       1893  8c58e53080d71af727f85a04f3992fcc  ir-rescue\tools-win\ascii\data.txt
-     35040  eb40de3a6cb9c19904c8c0e9f0fe111a  ir-rescue\tools-win\ascii\sam.jpg
-      4840  e39e649fda185c09d4174539a197c20b  ir-rescue\tools-win\ascii\sam.txt
-    587776  42badc1d2f03a8b1e4875740d3d49336  ir-rescue\tools-win\7za.exe
-      4488  e4dbce7eb1fdc41d4b6d69ffaf336711  ir-rescue\tools-win\ascii\saminv.txt
-      5807  1ea704bfce83a44c76929528e60a70c2  ir-rescue\tools-win\cfg\ir-rescue.conf
+     35040  eb40de3a6cb9c19904c8c0e9f0fe111a  ir-rescue\tools-win\ascii\uncle-sam.jpg
+      4840  e39e649fda185c09d4174539a197c20b  ir-rescue\tools-win\ascii\uncle-sam.txt
+      4488  e4dbce7eb1fdc41d4b6d69ffaf336711  ir-rescue\tools-win\ascii\uncle-saminv.txt
+      7199  cd9216744ac0883cd6c80792276bc02f  ir-rescue\tools-win\cfg\ir-rescue.conf
         85  0d413be05000541b9d2d9e271b05e905  ir-rescue\tools-win\cfg\nonrecursive-accesschk.txt
         39  09074a0e11bc7ab480d79052c3d607ff  ir-rescue\tools-win\cfg\nonrecursive-iconext.txt
        103  4bd3f7da14142e303643985dcb76515d  ir-rescue\tools-win\cfg\nonrecursive-md5deep.txt
@@ -20,9 +27,9 @@
    1034269  41f0002436ccfb24b7851fa0de8d649f  ir-rescue\tools-win\cygwin\cygiconv-2.dll
      42013  91d57c6256fb7517a39a3f14eef10aeb  ir-rescue\tools-win\cygwin\cygintl-8.dll
     480797  7eefe668ac0e91a7f581ba8fd4527f5a  ir-rescue\tools-win\cygwin\cygpcre-1.dll
+   3518523  e822e67951e91a34acc551401cf03970  ir-rescue\tools-win\cygwin\cygwin1.dll
     209949  08f69fc190bb4d1d2e5ab14339df895d  ir-rescue\tools-win\cygwin\grep.exe
      46621  97b99a5fe5492755e3a99e15257888a2  ir-rescue\tools-win\cygwin\tr.exe
-   3518523  e822e67951e91a34acc551401cf03970  ir-rescue\tools-win\cygwin\cygwin1.dll
     178040  328ba584bd06c3083e3a66cb47779eac  ir-rescue\tools-win\evt\psloglist.exe
      43616  3ea924609fef8166456368026d533cf7  ir-rescue\tools-win\fs\AlternateStreamView.exe
     106080  4132933d6834ec38f12023b031e0502a  ir-rescue\tools-win\fs\AlternateStreamView64.exe
@@ -37,8 +44,8 @@
     488960  3ce8b519e68cf649c810160f37b8530f  ir-rescue\tools-win\fs\tsk\fls.exe
     918016  f2debbf5a5474f185a4355d342a8c9ba  ir-rescue\tools-win\fs\tsk\libewf.dll
     498688  686409aa813a7845a45c1ea76a4eefdc  ir-rescue\tools-win\fs\tsk\libvhdi.dll
-     69120  cb0cb30c818b60d06e4c199c69a882ae  ir-rescue\tools-win\fs\tsk\zlib.dll
     571904  4de9457dbf7c6e5d1b8e876a5ed8d0a7  ir-rescue\tools-win\fs\tsk\libvmdk.dll
+     69120  cb0cb30c818b60d06e4c199c69a882ae  ir-rescue\tools-win\fs\tsk\zlib.dll
     715424  088e659223761e033284ce23cabff819  ir-rescue\tools-win\mal\autoruns.exe
     843440  3d5554237d26bee4b146193121fea746  ir-rescue\tools-win\mal\Autoruns64.exe
     629416  b77f38f7d821cb18be87feda7ddd90ec  ir-rescue\tools-win\mal\autorunsc.exe
@@ -52,6 +59,8 @@
      27136  111449a95c0eef0b0af1fa3b542d49f9  ir-rescue\tools-win\mal\iconsext.exe
     424096  60a2331a2b28968585c7c7229d2424a8  ir-rescue\tools-win\mal\Listdlls.exe
     220336  8336396d50dcc9d5a5f66b078a8460dc  ir-rescue\tools-win\mal\Listdlls64.exe
+     39008  c449dc37bbc4b20136e0a1b3feb29994  ir-rescue\tools-win\mal\OfficeIns.exe
+     90720  bb9b8b3c2611d80c76e2fbcc6fdf5589  ir-rescue\tools-win\mal\OfficeIns64.exe
     178848  2c23d6223d4aff81ac137b6989bce05c  ir-rescue\tools-win\mal\pslist.exe
     202400  a285919b3737ed691e1d029e36213050  ir-rescue\tools-win\mal\pslist64.exe
     188584  02fe68328f96fee688da5885eb4c3cf0  ir-rescue\tools-win\mal\PsService.exe
@@ -61,15 +70,11 @@
      51808  387b49848af3ea86c404609082004353  ir-rescue\tools-win\mal\WinPrefetchView.exe
     112224  b6850fbaf0652ebe3a0bb5a54932b834  ir-rescue\tools-win\mal\WinPrefetchView64.exe
    1299968  c0555ee7f3d6bd2efdb514caf447c06c  ir-rescue\tools-win\mem\winpmem_1.6.2.exe
-    115408  0918459b7c0527ae8d1a7ba760c5cbb8  ir-rescue\tools-win\misc\LastActivityView.exe
-     39008  c449dc37bbc4b20136e0a1b3feb29994  ir-rescue\tools-win\misc\OfficeIns.exe
-     90720  bb9b8b3c2611d80c76e2fbcc6fdf5589  ir-rescue\tools-win\misc\OfficeIns64.exe
-     70352  2ec5ee49e81e1892aedc9bc239906ee8  ir-rescue\tools-win\misc\USBDeview.exe
-    179408  87717fea58960ec3077148b80131c395  ir-rescue\tools-win\misc\USBDeview64.exe
     149664  201058594991d79d5d8891dbbeeee3c6  ir-rescue\tools-win\net\psfile.exe
     168608  e52ac781c403dabe22dfa16aef8491be  ir-rescue\tools-win\net\psfile64.exe
     199544  0d9540f8ed3ec25cf65b21454bd72123  ir-rescue\tools-win\net\tcpvcon.exe
-     53760  75fb0aecd2cfef2210495a4f3cab5bcf  ir-rescue\tools-win\screenshot-cmd.exe
+     44032  3e2dbdfa5e58cb43cca56a3e077d50bf  ir-rescue\tools-win\nircmdc.exe
+    115200  8136d84d47cb62b4a4fe1f48eb64166e  ir-rescue\tools-win\nircmdc64.exe
     151200  c74673589d5dd38b6443da6054b8dd7a  ir-rescue\tools-win\sdelete.exe
     165544  c38bba6169a4a8d264c30552dc791c2a  ir-rescue\tools-win\sdelete64.exe
     773288  ac84a990d52e2168485bd0256e967301  ir-rescue\tools-win\sys\accesschk.exe
