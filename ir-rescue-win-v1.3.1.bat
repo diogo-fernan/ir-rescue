@@ -431,18 +431,27 @@
 	)
 	if %cfs-mft% equ true (
 		if %RUN% equ true (
-			call:cmd %FS%\log "%RCP% /FileNamePath:C:0 /OutputPath:%FS%"
-		) else set /A it+=1
+			for /L %%i in (1,1,%id%) do (
+				call:cmd %FS%\log "%RCP% /FileNamePath:!drivesuc[%%i]!:0 /OutputPath:%FS%"
+				ren %FS%\$MFT $MFT-!driveslc[%%i]!.bin > NUL 2>&1
+			)
+		) else set /A it+=%id%
 	)
 	if %cfs-log% equ true (
 		if %RUN% equ true (
-			call:cmd %FS%\log "%RCP% /FileNamePath:C:2 /OutputPath:%FS%"
-		) else set /A it+=1
+			for /L %%i in (1,1,%id%) do (
+				call:cmd %FS%\log "%RCP% /FileNamePath:!drivesuc[%%i]!:2 /OutputPath:%FS%"
+				ren %FS%\$LogFile $LogFile-!driveslc[%%i]!.bin > NUL 2>&1
+			)
+		) else set /A it+=%id%
 	)
 	if %cfs-jrnl% equ true (
 		if %RUN% equ true (
-			call:cmd %FS%\log "%EUJ% /DevicePath:C: /OutputPath:%~dp0\%FS%"
-		) else set /A it+=1
+			for /L %%i in (1,1,%id%) do (
+				call:cmd %FS%\log "%EUJ% /DevicePath:!drivesuc[%%i]!: /OutputPath:%~dp0\%FS%"
+				ren %FS%\$UsnJrnl_$J.bin $UsnJrnl_$J-!driveslc[%%i]!.bin > NUL 2>&1
+			)
+		) else set /A it+=%id%
 	)
 	:: "reg query HKLM\SYSTEM\CurrentControlSet\Services\VSS"
 	:: Sysinternals junctions
@@ -1384,7 +1393,9 @@
 	call:packd "zip" %REG%\user
 	call:packd "zip" %EVT%\evtx
 	call:packd "zip" %EVT%\txt
-	call:packf %FS%\$MFT %FS%\$LogFile %FS%\$UsnJrnl_$J.bin
+	call:packff %FS%\$MFT-*.bin %FS%\$MFT
+	call:packff %FS%\$LogFile-*.bin %FS%\$LogFile
+	call:packff %FS%\$UsnJrnl_$J-*.bin %FS%\$UsnJrnl_$J
 	call:packd "zip" %MAL%\Prefetch-* %MAL%\Prefetch
 	call:packd "zip" %MAL%\Tasks* %MAL%\Tasks
 	call:packd "7z" %MAL%\Startup-* %MAL%\Startup
@@ -1399,7 +1410,7 @@
 	call:cleandrr .\%MEM%\Minidump-*
 	call:cleandr .\%REG%\sys .\%REG%\user
 	call:cleandr .\%EVT%\evtx .\%EVT%\txt
-	call:cleanf .\%FS%\$MFT .\%FS%\$LogFile .\%FS%\$UsnJrnl_$J.bin
+	call:cleanf .\%FS%\$MFT-*.bin .\%FS%\$LogFile-*.bin .\%FS%\$UsnJrnl_$J-*.bin
 	call:cleandrr .\%MAL%\Prefetch-*
 	call:cleandrr .\%MAL%\Tasks*
 	call:cleandrr .\%MAL%\Startup-*
