@@ -1,6 +1,6 @@
 # *ir-rescue*
 
-*ir-rescue* is composed of two scripts that collect a myriad of **forensic data** from 32-bit and 64-bit **Windows** systems (*ir-rescue-win*) and from **Unix** systems (*ir-rescue-nix*). The scripts respect the order of volatility and artifacts that are changed with the execution (*e.g.*, prefetch files on Windows) and are intended for **incident response** use at different stages in the analysis and investigation process. Each are described as follows:
+*ir-rescue* is composed of two sister scripts that collect a myriad of **forensic data** from 32-bit and 64-bit **Windows** systems (*ir-rescue-win*) and from **Unix** systems (*ir-rescue-nix*). The scripts respect the order of volatility and artifacts that are changed with the execution (*e.g.*, prefetch files on Windows) and are intended for **incident response** use at different stages in the analysis and investigation process. Each are described as follows:
 
 * ***ir-rescue-win*** is fully written in Batch and can be set to perform comprehensive and customized acquisitions of specific types of *live data* and of *historical data* from available Volume Shadow Copy Service (VSS) copies. *ir-rescue-win* makes use of built-in Windows commands and well-known third party utilities from Sysinternals and NirSoft, for instance, some being open-source. PowerShell and the Windows Management Instrumentation (WMI) are not used in order to make *ir-rescue-win* transversally compatible.
 
