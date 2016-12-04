@@ -1,0 +1,9 @@
+/dev
+/home
+/mnt
+/proc
+/root
+/tmp
+/usr/include
+/usr/local
+/var

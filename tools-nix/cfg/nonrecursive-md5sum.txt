@@ -1,0 +1,9 @@
+/bin
+/boot
+/etc/init
+/etc/init.d
+/etc/rc*
+/run
+/sbin
+/usr/bin
+/usr/sbin

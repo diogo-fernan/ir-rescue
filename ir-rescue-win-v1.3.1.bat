@@ -238,12 +238,14 @@
 	if %csys% equ true (if %RUN% equ false mkdir .\%SYS%)
 	if %csys-info% equ true (
 		if %RUN% equ true (
+			call:cmd %SYS%\sys "date /T"
+			call:cmd %SYS%\sys "w32tm /query /status"
 			call:cmd %SYS%\sys "hostname"
 			call:cmd %SYS%\sys "ver"
 			call:cmd %SYS%\sys "type set.txt.tmp"
 			call:cmd %SYS%\sys "systeminfo"
 			call:cmd %SYS%\sys "%PSI% -accepteula -h -s -d"
-		) else set /A it+=5
+		) else set /A it+=7
 	)
 	:: "setx /?"
 	goto:eof
@@ -255,6 +257,7 @@
 			call:cmd %SYS%\acc "whoami"
 			call:cmd %SYS%\acc "%PSLO% -accepteula"
 			call:cmd %SYS%\acc "%PSL% -accepteula -c -p"
+			call:cmd %SYS%\acc "cmdkey /list"
 			call:cmd %SYS%\acc "net accounts"
 			call:cmd %SYS%\acc "net localgroup"
 			call:cmd %SYS%\acc "net localgroup Administrators"
@@ -271,7 +274,7 @@
 				)
 				call:cmd %SYS%\sid "%PSG% -accepteula !usid[%%i]!"
 			)
-		) else set /A it+=10+2*%iu%
+		) else set /A it+=11+2*%iu%
 	)
 	if %csys-acl% equ true (
 		if %RUN% equ true (
@@ -378,7 +381,7 @@
 			for /L %%i in (1,1,%id%) do (
 				call:cmd %FS%\fls-!driveslc[%%i]! "%FLS% -l -p -r \\.\!drivesuc[%%i]!:"
 			)
-			call:cmd %FS%\bin "type %FS%\fls-c.txt | findstr $Recycle.Bin"
+			call:cmd %FS%\bin "type %FS%\fls-*.txt | findstr /I $Recycle.Bin"
 		) else set /A it+=%id%+1
 	)
 	if %cfs-md5% equ true (
@@ -463,22 +466,22 @@
 
 	if %cmal-pf% equ true (
 		if %RUN% equ true (
-			call:cmdn %MAL%\Prefetch\log "reg query HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters /S"
-			reg query "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /S >> %MAL%\Prefetch\log.txt 2>&1
-			call:xcp %MAL%\Prefetch\log "%SystemRoot%\Prefetch\*.pf" "%MAL%\Prefetch-live"
-			call:cmdn %MAL%\Prefetch\log "%WPV% /prefetchfile %SystemRoot%\Prefetch\*.pf /sort ~7 /scomma %MAL%\Prefetch-live\*.csv"
+			call:cmdn %MAL%\prefetch "reg query HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters /S"
+			reg query "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters" /S >> %MAL%\prefetch.txt 2>&1
+			call:xcp %MAL%\prefetch "%SystemRoot%\Prefetch\*.pf" "%MAL%\Prefetch-live"
+			call:cmdn %MAL%\prefetch "%WPV% /prefetchfile %SystemRoot%\Prefetch\*.pf /sort ~7 /scomma %MAL%\Prefetch-live\*.csv"
 			for /F "tokens=*" %%i in ('dir /B /S %SystemRoot%\Prefetch\*.pf 2^>NUL') do (
-				call:cmdr %MAL%\Prefetch\log "%WPV% /prefetchfile %%i /sort ~7 /scomma %MAL%\Prefetch-live\%%~ni.csv"
+				%WPV% /prefetchfile "%%i" /sort ~7 /scomma "%MAL%\Prefetch-live\%%~ni.csv" >> %MAL%\prefetch.txt 2>&1
 			)
-		) else (mkdir .\%MAL%\Prefetch & set /A it+=3)
+		) else set /A it+=3
 		if %cmal-vss% equ true (
 			for /L %%i in (1,1,%iv%) do (
 				if /I %SYSROOTD% equ !vsscd[%%i]! (
 					if %RUN% equ true (
-						call:xcp %MAL%\log "!vssc[%%i]!%SYSROOTP%\Prefetch\*.pf" "%MAL%\Prefetch-!vsscf[%%i]!\"
-						call:cmdn %MAL%\log "%WPV% /prefetchfile !vssc[%%i]!%SYSROOTP%\Prefetch\*.pf /sort ~7 /scomma %MAL%\Prefetch-!vsscf[%%i]!\*.csv"
-						for /F "tokens=*" %%a in ('dir /B /S !vssc[%%i]!%SYSROOTP%\Prefetch\*.pf') do (
-							call:cmdr %MAL%\log "%WPV% /prefetchfile %%a /sort ~7 /scomma %MAL%\Prefetch-!vsscf[%%i]!\%%~na.csv"
+						call:xcp %MAL%\prefetch "!vssc[%%i]!%SYSROOTP%\Prefetch\*.pf" "%MAL%\Prefetch-!vsscf[%%i]!\"
+						call:cmdn %MAL%\prefetch "%WPV% /prefetchfile !vssc[%%i]!%SYSROOTP%\Prefetch\*.pf /sort ~7 /scomma %MAL%\Prefetch-!vsscf[%%i]!\*.csv"
+						for /F "tokens=*" %%a in ('dir /B /S !vssc[%%i]!%SYSROOTP%\Prefetch\*.pf 2^>NUL') do (
+							%WPV% /prefetchfile "%%a" /sort ~7 /scomma "%MAL%\Prefetch-!vsscf[%%i]!\%%~na.csv" >> %MAL%\prefetch.txt 2>&1
 						)
 					) else set /A it+=2
 				)

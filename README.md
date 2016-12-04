@@ -1,19 +1,33 @@
-# ir-rescue
+# *ir-rescue*
 
-*ir-rescue* is a lightweight Windows Batch script that collects a myriad of **forensic data** from 32-bit and 64-bit Windows systems while respecting the order of volatility and artifacts that are changed with the execution of the script (*e.g.*, prefetch files). It is intended for **incident response** use at different stages in the analysis and investigation process. It can be set to perform comprehensive and customized acquisitions of specific types of *live data* and of *historical data* from available Volume Shadow Copy Service (VSS) copies. The tool represents an effort to streamline host data collection, regardless of investigation needs, and to rely less on on-site support when remote access or live analysis is unavailable.
+*ir-rescue* is composed of two scripts that collect a myriad of **forensic data** from 32-bit and 64-bit **Windows** systems (*ir-rescue-win*) and from **Unix** systems (*ir-rescue-nix*). The scripts respect the order of volatility and artifacts that are changed with the execution (*e.g.*, prefetch files on Windows) and are intended for **incident response** use at different stages in the analysis and investigation process. Each are described as follows:
 
-*ir-rescue* makes use of built-in Windows commands and well-known third party utilities from Sysinternals and NirSoft, for instance, some being open-source. It is designed to group data collections according to data type. For example, all data that relates to networking, such as open file shares and Transmission Control Protocol (TCP) connections, is grouped together, while running processes, services and tasks are gathered under malware. The tool is also purposefully designed not to make use of PowerShell and of the Windows Management Instrumentation (WMI) in order to make it transversally compatible. The acquisition of data types and other general options are specified in a simple **configuration file**. It should be noted that the script launches a great number of commands and tools, thereby leaving a considerable **footprint** (*e.g.*, strings in the memory, prefetch files, program execution caches) on the system. The runtime varies depending on the computation power, disk write throughput and configurations set. Disk performance is especially important if secure deletion is set and when dumping 64-bit memory (usually 8 GB in size), which can take a considerable amount of time.
+* ***ir-rescue-win*** is fully written in Batch and can be set to perform comprehensive and customized acquisitions of specific types of *live data* and of *historical data* from available Volume Shadow Copy Service (VSS) copies. *ir-rescue-win* makes use of built-in Windows commands and well-known third party utilities from Sysinternals and NirSoft, for instance, some being open-source. PowerShell and the Windows Management Instrumentation (WMI) are not used in order to make *ir-rescue-win* transversally compatible.
 
-*ir-rescue* has been written for incident response and forensic analysts, as well as for security practitioners alike. It can thus be used to leverage the already bundled tools and commands during forensic activities.
+* ***ir-rescue-nix*** is written in Bash (v4+) and makes use of built-in Unix commands. Some commands used might not be POSIX-compliant and therefore might not be available on some Unix-like systems or variants, especially on older operating systems.
+
+*ir-rescue* is designed to group data collections according to data type. For example, all data that relates to networking, such as open file shares and Transmission Control Protocol (TCP) connections, is grouped together, while running processes, services and tasks are gathered under malware. The acquisition of data types and other general options are specified in a simple **configuration file**. It should be noted that the script launches a great number of commands and tools, thereby leaving a considerable **footprint** (*e.g.*, strings in the memory, prefetch files, program execution caches) on the system. The runtime varies depending on the computation power, disk write throughput and configurations set. Disk performance is especially important if secure deletion is set and when dumping 64-bit memory (usually 8 GB in size), which can take a considerable amount of time.
+
+*ir-rescue* has been written for incident response and forensic analysts, as well as for security practitioners alike. It represents an effort to streamline host data collection, regardless of investigation needs, and to rely less on on-site support when remote access or live analysis is unavailable. It can thus be used to leverage the already bundled tools and commands during forensic activities. 
 
 # Dependencies and Usage
 
-*ir-rescue* relies on a number of third-party utilities for gathering specific data from hosts. The versions of the tools are listed in the last section and are provided with the package as is and, therefore, their licenses and user agreements must be accepted before running *ir-rescue*. Their descriptions and organization in the **folder tree** structure are given below, with both 32-bit and 64-bit versions of the tools included adjacently, if applicable:
+*ir-rescue* relies on a number of third-party utilities for gathering specific data from hosts. The versions of the tools are listed in the last section and are provided with the package as is and, therefore, their licenses and user agreements must be accepted before running *ir-rescue*. Their descriptions and organization in the are given below, with both 32-bit and 64-bit versions of Windows tools included adjacently, if applicable:
 
-* `tools-win\`: third-party tools folder:
+* `tools-nix/`: third-party tools folder for *ir-rescue-nix*:
+	* `ascii/`: text ASCII art files in `*.txt` format;
+	* `cfg/`: configuration files:
+		* `ir-rescue-nix.conf`: main configuration file for *ir-rescue-nix*;
+		* `nonrecursive-(hidden|md5sum).txt`: hidden files and `md5sum` non-recursive locations;
+		* `nonrecursive.txt`: non-recursive locations for multiple tools;
+		* `recursive-(exec|hidden|md5sum).txt`: executables, hidden files and `md5sum` recursive locations;
+		* `recursive.txt`: recursive locations for multiple tools;
+	* `mem/`: memory tools:
+		* `linpmem-2.1.post4` (64-bit ELF): dumps the memory;
+* `tools-win\`: third-party tools folder for *ir-rescue-win*:
 	* `ascii\`: text ASCII art files in `*.txt` format;
 	* `cfg\`: configuration files:
-		* `ir-rescue.conf`: main configuration file;
+		* `ir-rescue-win.conf`: main configuration file *ir-rescue-win*;
 		* `nonrecursive-(acl|iconsext|md5deep).txt`: `accesschk[64].exe`, `iconsext.exe` and `md5deep[64].exe` non-recursive locations;
 		* `nonrecursive.txt`: non-recursive locations for multiple tools;
 		* `recursive-(acl|iconsext|md5deep).txt`: `accesschk[64].exe`, `iconsext.exe` and `md5deep[64].exe` recursive locations;
@@ -74,34 +88,23 @@
 	* `<HOSTNAME>-<DATE>\`: `<DATE>` follows the `YYYYMMDD` format:
 		* `ir-rescue`\: folder for `ir-rescue`-related data
 			* `ir-rescue.log`: verbose log file of status messages;
-			* `screenshot-#`: numbered screenshots;
+			* `screenshot-#`: numbered screenshots for *ir-rescue-win* only;
 		* folders named according to the data type set for collection.
 
-`ir-rescue` needs to be run under a command line console with **administrator rights** and requires no arguments. It makes use of a configuration file to set desired options. As such, executing the script simply needs the issuing of the Batch file as follows:
+*ir-rescue-win* needs to be run under a command line console with **administrator rights** while *ir-rescue-nix* needs to be run under a command line window with **root privileges**. Both require no arguments and make use of a respective configuration file to set desired options. As such, executing the scripts simply needs the issuing of the files as follows:
 
-* `ir-rescue.bat`
+* `ir-rescue-win-v1.x.y.bat`, or
+* `ir-rescue-nix-v1.x.y.sh`.
 
-Some tools that perform recursive searches or scans are set only to recurse on specific folders. This makes the data collection more targeted while taking into account run time performance as the folders specified are likely locations for analysis due to extensive use by malware. By default, the locations set in `tools-win\cfg\recursive.txt` for **recursive search** are the following:
+Some tools that perform recursive searches or scans are set only to recurse on specific folders. This makes the data collection more targeted while taking into account run time performance as the folders specified are likely locations for analysis due to extensive use by malware. The locations for **recursive search** and **non-recursive search** for Windows and Unix systems can be changed at will in the respective text files under the configuration folders. Some of the tools have dedicated files with specific locations in which to and not to recurse. These are named `recursive-<tool>.txt` and `nonrecursive-<tool>.txt`, with `<tool>` being changed to the tool name. Each file must have one **location as full path** per line without trailing backslashes or forward slashes.
 
-* `C:\Users`;
-* `C:\ProgramData`;
-* `C:\Windows\Temp`;
-* `D:`.
-
-In turn, the locations also set in `tools-win\cfg\nonrecursive.txt` for **non-recursive search** are the following:
-
-* `C:\Windows\system(32|64)`;
-* `C:\Windows\system(32|64)\drivers`.
-
-Some of the tools have dedicated files with specific locations to and not to recurse. These are also kept under `tools-win\cfg\` and are named `recursive-<tool>.txt` and `nonrecursive-<tool>.txt`, with `<tool>` being changed to the tool name. All these files can be changed with the desired locations for analysis. Each file must have one **location as full path** without the trailing backslash per line.
-
-During runtime, all characters printed to the Standard Output (`STDOUT`) and Standard Error (`STDERR`) channels are logged to UTF-8 encoded text files. This means that the output of tools are stored in corresponding folders and text files. Status ASCII messages are still printed to the console in order to check the execution progress. A temporary folder created under `%TEMP%\ir-rescue` is used to store runtime data (memory dump driver and links to VSS copies) and is deleted upon completion. After collection, data can be compressed into a password-protected archive and accordingly deleted afterwards, if set to do so.
+During runtime, all characters printed to the Standard Output (`STDOUT`) and Standard Error (`STDERR`) channels are logged to UTF-8 encoded text files. This means that the output of tools are stored in corresponding folders and text files. Status ASCII messages are still printed to the console in order to check the execution progress. A temporary folder created under `%TEMP%\ir-rescue` or `/tmp/ir-rescue` is used to store runtime data (*e.g.*, memory dump drivers and links to VSS copies) and is deleted upon completion. After collection, data can be compressed into a password-protected archive and accordingly deleted afterwards, if set to do so.
 
 # Configuration File
 
-The configuration file is composed of simple binary directives (`true` or `false`) for the general behaviour of the script, for which data types to collect and for which advanced tools to run. Lines preceded by a pound sign are considered comments. These are used to briefly describe what each option does, to enumerate folders, files or registry keys important to provide some context, as well as to list relevant tools.
+The configuration file of each *ir-rescue-win* and *ir-rescue-nix* are composed of simple binary directives (`true` or `false`) for the general behaviour of the scripts, for which data types to collect and for which advanced tools to run. Lines preceded by a hash sign (`#`) are considered comments. These are used to briefly describe what each option does, to enumerate folders, files or registry keys important to provide some context, as well as to list relevant tools. The descriptions below applies only to *ir-rescue-win*, but they serve as an example to understand the overall approach and the configuration file of *ir-rescue-nix*.
 
-Essentially, data is grouped into the types given by the following directives:
+For *ir-rescue-win*, data is grouped into the types given by the following directives:
 
 * `memory`: this options sets the collection of the memory;
 * `registry`: this option sets the collection of system and user registry;
@@ -155,17 +158,19 @@ events-txt=true
 
 # Third-Party Tool List and References
 
-* **Sysinternals**: the [Sysinternals](https://technet.microsoft.com/en-us/sysinternals/ "Sysinternals Web Site") tools have been mostly developed by Mark Russinovich and are free to use under the [Sysinternals Software License Terms](https://technet.microsoft.com/en-us/sysinternals/bb469936.aspx "Sysinternals Software License Terms"). The full list of tools used by *ir-rescue* is `accesschk[64].exe` (v6.02), `autoruns[64].exe` (v13.62), `autorunsc[64].exe` (v13.61), `handle[64].exe` (v4.1), `Listdlls[64].exe` (v3.2), `logonsessions[64].exe` (v1.4), `ntfsinfo[64].exe` (v1.2), `psfile[64].exe` (v1.03), `PsGetsid[64].exe` (v1.45), `Psinfo[64].exe` (v1.78), `pslist[64].exe` (v1.4), `psloggedon[64].exe` (v1.35), `psloglist.exe` (v2.71), `PsService[64].exe` (v2.25), `sdelete(32|64).exe` (v2.0), `sigcheck[64].exe` (v2.52), and `tcpvcon.exe` (v3.01).
+## Windows
 
-* **NirSoft**: the [NirSoft](http://www.nirsoft.net/ "NirSoft Web Site") suite of tools are developed by Nir Sofer and are released as freeware utilities. The full list of tools used by *ir-rescue* is `AlternateStreamView[64].exe` (v1.51), `BrowsingHistoryView[64].exe` (v1.86), `ChromeCacheView.exe` (v1.67), `DriverView[64].exe` (v1.47), `iconsext.exe` (v1.47), `IECacheView.exe` (v1.58), `LastActivityView.exe` (v1.16), `MozillaCacheView.exe` (v1.69), `nircmdc[64].exe` (v2.81), `OfficeIns[64].exe` (v1.20), `USBDeview[64].exe` (v2.61), and `WinPrefetchView[64].exe` (v1.35).
+* **Sysinternals**: the [Sysinternals](https://technet.microsoft.com/en-us/sysinternals/ "Sysinternals Web Site") tools have been mostly developed by Mark Russinovich and are free to use under the [Sysinternals Software License Terms](https://technet.microsoft.com/en-us/sysinternals/bb469936.aspx "Sysinternals Software License Terms"). The full list of tools used by *ir-rescue-win* is `accesschk[64].exe` (v6.02), `autoruns[64].exe` (v13.62), `autorunsc[64].exe` (v13.61), `handle[64].exe` (v4.1), `Listdlls[64].exe` (v3.2), `logonsessions[64].exe` (v1.4), `ntfsinfo[64].exe` (v1.2), `psfile[64].exe` (v1.03), `PsGetsid[64].exe` (v1.45), `Psinfo[64].exe` (v1.78), `pslist[64].exe` (v1.4), `psloggedon[64].exe` (v1.35), `psloglist.exe` (v2.71), `PsService[64].exe` (v2.25), `sdelete(32|64).exe` (v2.0), `sigcheck[64].exe` (v2.52), and `tcpvcon.exe` (v3.01).
 
-* **Cygwin**: the [Cygwin](http://www.cygwin.com/ "Cygwin Web Site") project is open-source and is used by *ir-rescue* only to filter outputs with the `tr.exe` (v8.24-3) and `grep.exe` (v2.21) utilities, using the 32-bit DLLs.
+* **NirSoft**: the [NirSoft](http://www.nirsoft.net/ "NirSoft Web Site") suite of tools are developed by Nir Sofer and are released as freeware utilities. The full list of tools used by *ir-rescue-win* is `AlternateStreamView[64].exe` (v1.51), `BrowsingHistoryView[64].exe` (v1.86), `ChromeCacheView.exe` (v1.67), `DriverView[64].exe` (v1.47), `iconsext.exe` (v1.47), `IECacheView.exe` (v1.58), `LastActivityView.exe` (v1.16), `MozillaCacheView.exe` (v1.69), `nircmdc[64].exe` (v2.81), `OfficeIns[64].exe` (v1.20), `USBDeview[64].exe` (v2.61), and `WinPrefetchView[64].exe` (v1.35).
 
-* **The Sleuth Kit (TSK)** (v4.3.0): the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is an open-source forensic tool to analyze hard drives at the file system level, used by *ir-rescue* only to walk the MFT with `fls.exe`.
+* **Cygwin**: the [Cygwin](http://www.cygwin.com/ "Cygwin Web Site") project is open-source and is used by *ir-rescue-win* only to filter outputs with the `tr.exe` (v8.24-3) and `grep.exe` (v2.21) utilities, using the 32-bit DLLs.
+
+* **The Sleuth Kit (TSK)** (v4.3.0): the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is an open-source forensic tool to analyze hard drives at the file system level, used by *ir-rescue-win* only to walk the MFT with `fls.exe`.
 
 * **7za.exe** (v9.20): [7-Zip](http://www.7-zip.org/) is an open-source compression utility developed by Igor Pavlov and release under the GNU LGPL license.
 
-* **winpmem_1.6.2** (v1.6.2): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue* to dump the memory.
+* **winpmem_1.6.2** (v1.6.2): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue-win* to dump the memory.
 
 * **md5deep[64].exe** (v4.4): the [md5deep](http://md5deep.sourceforge.net/ "md5deep Web Site") utility is open-source and is maintained by Jesse Kornblum.
 
@@ -178,3 +183,8 @@ events-txt=true
 * **densityscout[64].exe** (build 45): the [DensityScout](https://www.cert.at/downloads/software/densityscout_en.html "DensityScout Web Site") utility to compute entropy was written by Christian Wojner and is released under the ISC license. 
 
 * **YARA** (v3.5.0): [YARA](http://virustotal.github.io/yara/ "Yara Web Site") is an open-source signature scheme for malware that can be used to perform scans of specific indicators.
+
+## Unix
+
+* **linpmem-2.1.post4** (v2.1.post4): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue-nix* to dump the memory.
+

@@ -1,7 +1,22 @@
-     55560  b9dd57a559c1cce664cf300a4058805c  ir-rescue\ir-rescue-win-v1.3.1.bat
+     19392  f0abba524884c5890aab1198e1d1b55f  ir-rescue\ir-rescue-nix-v1.0.0.sh
+     55663  e8a539632df76f8c88f8efbd9dcd98b4  ir-rescue\ir-rescue-win-v1.3.1.bat
          0  d41d8cd98f00b204e9800998ecf8427e  ir-rescue\ir-rescue.md5
-      1812  c307b06489d20d5cd480467509f88dad  ir-rescue\LICENSE
-     16031  9cda5167535b42b8dc9f150705c986d8  ir-rescue\README.md
+      1859  882be64f7b850edf8bf224f092e63f11  ir-rescue\LICENSE
+     17461  996d18f7a26db4646e7766b75fed7f69  ir-rescue\README.md
+      1217  7ac576d4282de436cc860d861fd45cc4  ir-rescue\tools-nix\ascii\cyb.txt
+      1893  8c58e53080d71af727f85a04f3992fcc  ir-rescue\tools-nix\ascii\data.txt
+     35040  eb40de3a6cb9c19904c8c0e9f0fe111a  ir-rescue\tools-nix\ascii\uncle-sam.jpg
+      4840  e39e649fda185c09d4174539a197c20b  ir-rescue\tools-nix\ascii\uncle-sam.txt
+      4488  e4dbce7eb1fdc41d4b6d69ffaf336711  ir-rescue\tools-nix\ascii\uncle-saminv.txt
+      4448  f5839d3e2e1eb0e88288f03bad9f8d89  ir-rescue\tools-nix\cfg\ir-rescue-nix.conf
+        71  08e9b1158bebcebd18095392787217f6  ir-rescue\tools-nix\cfg\nonrecursive-hidden.txt
+        71  08e9b1158bebcebd18095392787217f6  ir-rescue\tools-nix\cfg\nonrecursive-md5sum.txt
+        71  08e9b1158bebcebd18095392787217f6  ir-rescue\tools-nix\cfg\nonrecursive.txt
+       116  be7884352db60b96b7682d7b964be77b  ir-rescue\tools-nix\cfg\recursive-exec.txt
+        86  0d5e9300b76d3f42b58b8b88d258eddf  ir-rescue\tools-nix\cfg\recursive-hidden.txt
+        36  d7f1f1aeff73a358b65658314a9b599c  ir-rescue\tools-nix\cfg\recursive-md5sum.txt
+        61  9b8d6d7a3439bc6d562a09d783f8a13b  ir-rescue\tools-nix\cfg\recursive.txt
+   7272696  4a5a922b0c0c2b38131fb4831cc4ece9  ir-rescue\tools-nix\mem\linpmem-2.1.post4
     587776  42badc1d2f03a8b1e4875740d3d49336  ir-rescue\tools-win\7za.exe
    1490432  8e9279bc6a08b770ae40e238f5e5d262  ir-rescue\tools-win\activ\JLECmd.exe
     115408  0918459b7c0527ae8d1a7ba760c5cbb8  ir-rescue\tools-win\activ\LastActivityView.exe
@@ -15,7 +30,6 @@
      35040  eb40de3a6cb9c19904c8c0e9f0fe111a  ir-rescue\tools-win\ascii\uncle-sam.jpg
       4840  e39e649fda185c09d4174539a197c20b  ir-rescue\tools-win\ascii\uncle-sam.txt
       4488  e4dbce7eb1fdc41d4b6d69ffaf336711  ir-rescue\tools-win\ascii\uncle-saminv.txt
-      7479  9ab40c963dcd01c249e50e4d9959541e  ir-rescue\tools-win\cfg\ir-rescue.conf
         85  0d413be05000541b9d2d9e271b05e905  ir-rescue\tools-win\cfg\nonrecursive-accesschk.txt
         39  09074a0e11bc7ab480d79052c3d607ff  ir-rescue\tools-win\cfg\nonrecursive-iconext.txt
        103  4bd3f7da14142e303643985dcb76515d  ir-rescue\tools-win\cfg\nonrecursive-md5deep.txt

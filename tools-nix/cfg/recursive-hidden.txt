@@ -1,0 +1,12 @@
+/dev
+/home
+/lib
+/mnt
+/proc
+/root
+/tmp
+/usr/include
+/usr/lib
+/usr/local
+/usr/share
+/var

@@ -1,0 +1,7 @@
+/dev
+/home
+/lib
+/mnt
+/root
+/tmp
+/var

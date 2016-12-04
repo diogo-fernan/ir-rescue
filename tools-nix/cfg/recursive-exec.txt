@@ -1,0 +1,15 @@
+/bin
+/boot
+/dev
+/etc/init
+/etc/init.d
+/etc/rc*
+/root
+/run
+/sbin
+/tmp
+/usr/bin
+/usr/include
+/usr/local
+/usr/sbin
+/var
