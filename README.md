@@ -46,6 +46,8 @@
 	* `fs\`: filesystem tools:
 		* `tsk\`: The Sleuth Kit (TSK) tools and DLLs:
 			* `fls.exe`: walks the Master File Table (MFT);
+			* `mcat.exe`: outputs the contents of a partition;
+			* `mmls.exe`: shows information about disk partition tables (DOS, GPT);
 		* `AlternateStreamView[64].exe`: lists Alternate Data Streams (ADSs);
 		* `ExtractUsnJrnl[64].exe`: extracts the `C:\$Extend\$UsnJrnl` (NTFS journal) file without the sparsed zeroes;
 		* `md5deep[64].exe`: computes Message Digest 5 (MD5) hash values;
@@ -70,6 +72,8 @@
 	* `net\`: network tools:
 		* `psfile[64].exe`: lists files opened remotely;
 		* `tcpvcon.exe`: lists TCP connections and ports and UDP ports;
+	* `reg\`: registry tools:
+		* `RegRipper2.8\rip.exe`: parses multiple artifacts from registry hive files;
 	* `sys\`: system tools:
 		* `accesschk[64].exe`: lists user permissions of the specified locations;
 		* `logonsessions[64].exe`: lists currently active logon sessions;
@@ -98,16 +102,16 @@
 
 *ir-rescue-win* needs to be run under a command line console with **administrator rights** while *ir-rescue-nix* needs to be run under a command line window with **root privileges**. Both require no arguments and make use of a respective configuration file to set desired options. As such, executing the scripts simply needs the issuing of the files as follows:
 
-* `ir-rescue-win-v1.x.y.bat`, or
-* `chmod +x ir-rescue-nix-v1.x.y.sh; ./ir-rescue-nix-v1.x.y.sh`.
+* `ir-rescue-win-v1.w.x.bat`, or
+* `chmod +x ir-rescue-nix-v1.y.z.sh; ./ir-rescue-nix-v1.y.z.sh`.
 
 Some tools that perform recursive searches or scans are set only to recurse on specific folders. This makes the data collection more targeted while taking into account run time performance as the folders specified are likely locations for analysis due to extensive use by malware. The locations for **recursive search** and **non-recursive search** for Windows and Unix systems can be changed at will in the respective text files under the configuration folders. Some of the tools have dedicated files with specific locations in which to and not to recurse. These are named `recursive-<tool>.txt` and `nonrecursive-<tool>.txt`, with `<tool>` being changed to the tool name. Each file must have one **location as full path** per line without trailing backslashes or forward slashes.
 
-During runtime, all characters printed to the Standard Output (`STDOUT`) and Standard Error (`STDERR`) channels are logged to UTF-8 encoded text files. This means that the output of tools are stored in corresponding folders and text files. Status ASCII messages are still printed to the console in order to check the execution progress. A temporary folder created under `%TEMP%\ir-rescue` or `/tmp/ir-rescue` is used to store runtime data (*e.g.*, memory dump drivers and links to VSS copies) and is deleted upon completion. Data folders are created as placeholders for data during initialization. After collection, empty folders may be deleted if no data was collected (*e.g.*, empty browsers cache). In the end, data is compressed into a password-protected archive and is accordingly deleted afterwards, if set to do so.
+During runtime, all characters printed to the Standard Output (`STDOUT`) and Standard Error (`STDERR`) channels are logged to UTF-8 encoded text files. This means that the output of tools are stored in corresponding folders and text files. Status ASCII messages are still printed to the console in order to check the execution progress. A temporary folder created under `%TEMP%\ir-rescue-win` or `/tmp/ir-rescue-nix` is used to store runtime data (*e.g.*, memory dump drivers and links to VSS copies) and is deleted upon completion. Data folders are created as placeholders for data during initialization. After collection, empty folders may be deleted if no data was collected (*e.g.*, empty browsers cache). In the end, data is compressed into a password-protected archive and is accordingly deleted afterwards, if set to do so.
 
 # Configuration File
 
-The configuration file of each *ir-rescue-win* and *ir-rescue-nix* are composed of simple binary directives (`true` or `false`) for the general behaviour of the scripts, for which data types to collect and for which advanced tools to run. Lines preceded by a hash sign (`#`) are considered comments. These are used to briefly describe what each option does, to enumerate folders, files or registry keys important to provide some context, as well as to list relevant tools. The descriptions below applies only to *ir-rescue-win*, but they serve as an example to understand the overall approach and the configuration file of *ir-rescue-nix*.
+The configuration file of each *ir-rescue-win* and *ir-rescue-nix* are mostly composed of simple binary directives (`true` or `false`) for the general behaviour of the scripts, for which data types to collect and for which advanced tools to run. Lines preceded by a hash sign (`#`) are considered comments. These are used to briefly describe what each option does, to enumerate folders, files or registry keys important to provide some context, as well as to list relevant tools. The descriptions below applies only to *ir-rescue-win*, but they serve as an example to understand the overall approach and the configuration file of *ir-rescue-nix*.
 
 For *ir-rescue-win*, data is grouped into the types given by the following directives:
 
@@ -169,11 +173,7 @@ events-txt=true
 
 * **NirSoft**: the [NirSoft](http://www.nirsoft.net/ "NirSoft Web Site") suite of tools are developed by Nir Sofer and are released as freeware utilities. The full list of tools used by *ir-rescue-win* is `AlternateStreamView[64].exe` (v1.51), `BrowserAddonsView[64].exe` (v1.05), `BrowsingHistoryView[64].exe` (v1.86), `ChromeCacheView.exe` (v1.67), `DriverView[64].exe` (v1.47), `iconsext.exe` (v1.47), `IECacheView.exe` (v1.58), `LastActivityView.exe` (v1.16), `MozillaCacheView.exe` (v1.69), `nircmdc[64].exe` (v2.81), `OfficeIns[64].exe` (v1.20), `USBDeview[64].exe` (v2.61), and `WinPrefetchView[64].exe` (v1.35).
 
-* **Cygwin**: the [Cygwin](http://www.cygwin.com/ "Cygwin Web Site") project is open-source and is used by *ir-rescue-win* only to filter outputs with the GNU `tr.exe` (v8.24-3) and `grep.exe` (v2.21) utilities, using the 32-bit DLLs.
-
-* **The Sleuth Kit (TSK)** (v4.3.0): the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is an open-source forensic tool to analyze hard drives at the file system level, used by *ir-rescue-win* only to walk the MFT with `fls.exe`.
-
-* **7za.exe** (v9.20): [7-Zip](http://www.7-zip.org/) is an open-source compression utility developed by Igor Pavlov and release under the GNU LGPL license.
+* **The Sleuth Kit (TSK)** (v4.4.0): the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is an open-source forensic tool to analyze hard drives at the file system level, used by *ir-rescue-win* to walk the MFT with `fls.exe`, to dump disk boot sectors with `mmcat.exe` and to show disk partition table information with `mmls.exe`.
 
 * **winpmem_1.6.2** (v1.6.2): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue-win* to dump the memory.
 
@@ -181,13 +181,19 @@ events-txt=true
 
 * **LECmd.exe** (v0.9.2.0) and **JLECmd.exe** (v0.9.6.1): [LECmd](https://github.com/EricZimmerman/LECmd "LECmd GitHub Repository") and [JLECmd](https://github.com/EricZimmerman/JLECmd "JLECmd GitHub Repository") are open-source, MIT-licensed parsers for LNK and for automatic and custom destinations jump lists with support for Windows 7 thru Windows 10, respectively. These are developed by Eric Zimmerman and require .NET v4.6.
 
-* **rifiuti-vista[64].exe** (v.0.6.1): [Rifiuti2](https://github.com/abelcheung/rifiuti2 "Rifiuti2 GitHub Repository") is an open-source parser for the recycle bin released under the BSD license.
-
 * **RawCopy[64].exe** (v1.0.0.15) and **ExtractUsnJrnl[64].exe** (v1.0.0.3): [RawCopy](https://github.com/jschicht/RawCopy "RawCopy GitHub Repository") (essentially, a combination of **ifind** and **icat** from TSK) and [ExtractUsnJrnl](https://github.com/jschicht/ExtractUsnJrnl "ExtractUsnJrnl GitHub Repository") are open-source NTFS utilities to extract data and special files developed by Joakim Schicht.
+
+* **rip.exe** (v2.8): [RegRipper](https://github.com/keydet89/RegRipper2.8) is an open-source parser for several artifacts present in registry hive files.
+
+* **rifiuti-vista[64].exe** (v.0.6.1): [Rifiuti2](https://github.com/abelcheung/rifiuti2 "Rifiuti2 GitHub Repository") is an open-source parser for the recycle bin released under the BSD license.
 
 * **densityscout[64].exe** (build 45): the [DensityScout](https://www.cert.at/downloads/software/densityscout_en.html "DensityScout Web Site") utility to compute entropy was written by Christian Wojner and is released under the ISC license. 
 
 * **YARA** (v3.5.0): [YARA](http://virustotal.github.io/yara/ "Yara Web Site") is an open-source signature scheme for malware that can be used to perform scans of specific indicators.
+
+* **Cygwin**: the [Cygwin](http://www.cygwin.com/ "Cygwin Web Site") project is open-source and is used by *ir-rescue-win* only to filter outputs with the GNU `tr.exe` (v8.24-3) and `grep.exe` (v2.21) utilities, using the 32-bit DLLs.
+
+* **7za.exe** (v9.20): [7-Zip](http://www.7-zip.org/) is an open-source compression utility developed by Igor Pavlov and release under the GNU LGPL license.
 
 ## Unix
 
@@ -195,4 +201,6 @@ events-txt=true
 
 # Change History
 
-* ***ir-rescue-win-v1.4.0***: restructured the data collection order, changed the console output, extended functionality with configurable options (`outpath`, `rm-glog`, `vss-limit` and `drives-limit`) and added NirSoft `BrowserAddonsView[64].exe` and a less verbose global log file.
+* ***ir-rescue-win-v1.4.1***: added the collection of application crash dumps (`memory-appdumps`), added the text export and parsing of registry hives (`registry-text` and `registry-parse`), added the dump and parsing of the boot sector (`filesystem-boot` and `filesystem-table`), and made some general improvements.
+
+* ***ir-rescue-win-v1.4.0***: restructured the data collection order and output, extended functionality with configurable options (`outpath`, `rm-glog`, `vss-limit` and `drives-limit`) and added NirSoft `BrowserAddonsView[64].exe` and a less verbose global log file.

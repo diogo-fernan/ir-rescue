@@ -1,7 +1,7 @@
-Software:   ir-rescue
-Environment:    Windows Batch and Bash
+Software:     ir-rescue (https://github.com/diogo-fernan/ir-rescue)
+Environment:  Windows Batch and Bash
 
-Copyright © 2016 Diogo A. B. Fernandes.
+Copyright © 2017 Diogo A. B. Fernandes.
 All rights reserved.
 
 Redistribution of this software and use in source and binary forms, with 
