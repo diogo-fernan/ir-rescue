@@ -784,16 +784,6 @@
 				)
 			)
 		)
-		if %creg-parse% equ true (
-			if %RUN% equ true (
-				call:header "user registry hives" "parsing"
-				call:cmdl %REG%\log.txt "xcopy %TOOLS%\reg\RegRipper2.8\plugins .\plugins /C /E /F /I /Y"
-				for %%i in (%REG%\user\NTUSER*) do (
-					call:cmd %REG%\user-rip "%RR% -r %%i -f ntuser"
-				)
-				call:cmdl %REG%\log.txt "rmdir /Q /S .\plugins"
-			) else (set /A it+=1, itt+=!tmp!)
-		)
 	)
 	if %creg-text% equ true (
 		if %RUN% equ true (
@@ -1217,7 +1207,6 @@
 	set PSS=%TOOLS%\mal\PsService.exe
 	set RB=%TOOLS%\activ\rifiuti-vista.exe
 	set RCP=%TOOLS%\fs\RawCopy.exe
-	set RR=%TOOLS%\reg\RegRipper2.8\rip.exe
 	set SIG=%TOOLS%\mal\sigcheck.exe
 	set TCPV=%TOOLS%\net\tcpvcon.exe
 	set USB=%TOOLS%\activ\USBDeview.exe
@@ -1435,7 +1424,6 @@
 		call:rconff registry-system creg-sys !creg-all! !creg!
 		call:rconff registry-user creg-user !creg-all! !creg!
 		call:rconff registry-text creg-text !creg-all! !creg!
-		call:rconff registry-parse creg-parse !creg-all! !creg!
 
 		call:rconf system csys
 		call:rconf system-all csys-all
@@ -1780,6 +1768,12 @@
 	)
 	goto:eof
 
+:unpackf <srcf> <dstd>
+	if exist %%i (
+		call:cmdl "%LOG%" "%ZIP% x %~1 -o%~2 -y"
+	)
+	goto:eof
+
 :cleand <srcd ...>
 	call:clean "%LOG%" "rmdir" "nonrecursive" %*
 	goto:eof
@@ -1835,7 +1829,7 @@
 	set "str=!%~1!#"
 	set /A len=0
 	for %%i in (4096 2048 1024 512 256 128 64 32 16 8 4 2 1) do (
-		if "!str:~%%i,1!" neq "" ( 
+		if "!str:~%%i,1!" neq "" (
 			set /A len+=%%i
 			set "str=!str:~%%i!"
 		)
@@ -1933,3 +1927,23 @@
 	:: TZWorks LNK Parsing; *.lnk
 	:: TZWorks ntfswalk, ntfscopy
 	:: Redline Comprehensive Collector; WinAudit
+
+
+	:: removed RegRipper
+	:: # parse user registry hives ("%USERPROFILE%\NTUSER.dat") from all users
+	:: # requires 'registry-user=true'
+	:: # "rip.exe"
+	:: registry-parse=true
+	:: set RR=%TOOLS%\reg\RegRipper2.8\rip.exe
+	:: call:rconff registry-parse creg-parse !creg-all! !creg!
+	:: if %creg-parse% equ true (
+	::	if %RUN% equ true (
+	::		call:header "user registry hives" "parsing"
+	::		call:unpackf "%TOOLS%\reg\RegRipper2.8\plugins.zip" ".\"
+	::		:: call:cmdl %REG%\log.txt "xcopy %TOOLS%\reg\RegRipper2.8\plugins .\plugins /C /E /F /I /Y"
+	::		for %%i in (%REG%\user\NTUSER*) do (
+	::			call:cmd %REG%\user-rip "%RR% -r %%i -f ntuser"
+	::		)
+	::		call:cmdl %REG%\log.txt "rmdir /Q /S .\plugins"
+	::	) else (set /A it+=1, itt+=!tmp!)
+	:: )
