@@ -72,8 +72,6 @@
 	* `net\`: network tools:
 		* `psfile[64].exe`: lists files opened remotely;
 		* `tcpvcon.exe`: lists TCP connections and ports and UDP ports;
-	* `reg\`: registry tools:
-		* `RegRipper2.8\rip.exe`: parses multiple artifacts from registry hive files;
 	* `sys\`: system tools:
 		* `accesschk[64].exe`: lists user permissions of the specified locations;
 		* `logonsessions[64].exe`: lists currently active logon sessions;
@@ -183,8 +181,6 @@ events-txt=true
 
 * **RawCopy[64].exe** (v1.0.0.15) and **ExtractUsnJrnl[64].exe** (v1.0.0.3): [RawCopy](https://github.com/jschicht/RawCopy "RawCopy GitHub Repository") (essentially, a combination of **ifind** and **icat** from TSK) and [ExtractUsnJrnl](https://github.com/jschicht/ExtractUsnJrnl "ExtractUsnJrnl GitHub Repository") are open-source NTFS utilities to extract data and special files developed by Joakim Schicht.
 
-* **rip.exe** (v2.8): [RegRipper](https://github.com/keydet89/RegRipper2.8) is an open-source parser for several artifacts present in registry hive files.
-
 * **rifiuti-vista[64].exe** (v.0.6.1): [Rifiuti2](https://github.com/abelcheung/rifiuti2 "Rifiuti2 GitHub Repository") is an open-source parser for the recycle bin released under the BSD license.
 
 * **densityscout[64].exe** (build 45): the [DensityScout](https://www.cert.at/downloads/software/densityscout_en.html "DensityScout Web Site") utility to compute entropy was written by Christian Wojner and is released under the ISC license. 
@@ -200,6 +196,8 @@ events-txt=true
 * **linpmem-2.1.post4** (v2.1.post4): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue-nix* to dump the memory.
 
 # Change History
+
+* ***ir-rescue-win-v1.4.2***: removed RegRipper (`registry-parse`) (too heavy and best to post-process registry hives).
 
 * ***ir-rescue-win-v1.4.1***: added the collection of application crash dumps (`memory-appdumps`), added the text export and parsing of registry hives (`registry-text` and `registry-parse`), added the dump and parsing of the boot sector (`filesystem-boot` and `filesystem-table`), and made some general improvements.
 
