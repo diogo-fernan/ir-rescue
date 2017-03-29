@@ -1159,7 +1159,7 @@
 	:: variables
 	call:date
 	set NAME=ir-rescue-win
-	set VER=v1.4.1
+	set VER=v1.4.2
 	set TOOLS=tools-win
 
 	set CFG=%TOOLS%\cfg
@@ -1298,7 +1298,6 @@
 	if not exist %PSS%	 (echo.&echo  ERROR: %PSS% not found. & set /A f=1)
 	if not exist %RB%	 (echo.&echo  ERROR: %RB% not found. & set /A f=1)
 	if not exist %RCP%	 (echo.&echo  ERROR: %RCP% not found. & set /A f=1)
-	if not exist %RR%	 (echo.&echo  ERROR: %RR% not found. & set /A f=1)
 	if not exist %SDEL%	 (echo.&echo  ERROR: %SDEL% not found. & set /A f=1)
 	if not exist %SIG%	 (echo.&echo  ERROR: %SIG% not found. & set /A f=1)
 	if not exist %TCPV%	 (echo.&echo  ERROR: %TCPV% not found. & set /A f=1)
@@ -1935,6 +1934,7 @@
 	:: # "rip.exe"
 	:: registry-parse=true
 	:: set RR=%TOOLS%\reg\RegRipper2.8\rip.exe
+	:: if not exist %RR%	 (echo.&echo  ERROR: %RR% not found. & set /A f=1)
 	:: call:rconff registry-parse creg-parse !creg-all! !creg!
 	:: if %creg-parse% equ true (
 	::	if %RUN% equ true (
