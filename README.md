@@ -8,7 +8,7 @@
 
 *ir-rescue* is designed to group data collections according to data type. For example, all data that relates to networking, such as open file shares and Transmission Control Protocol (TCP) connections, is grouped together, while running processes, services and tasks are gathered under malware. The acquisition of data types and other general options are specified in a simple **configuration file**. It should be noted that the scripts launch a great number of commands and tools, thereby leaving a considerable **footprint** (*e.g.*, strings in the memory, prefetch files, program execution caches) on the system. The runtime varies depending on the computation power, disk write throughput and configurations set. Disk performance is especially important if secure deletion is set and when dumping 64-bit memory (usually 8 GB in size), which can take a considerable amount of time.
 
-*ir-rescue* has been written for incident response and forensic analysts, as well as for security practitioners alike. It represents an effort to streamline host data collection, regardless of investigation needs, and to rely less on on-site support when remote access or live analysis is unavailable. It can thus be used to leverage the already bundled tools and commands during forensic activities. 
+*ir-rescue* has been written for incident response and forensic analysts, as well as for security practitioners alike. It represents an effort to streamline host data collection, regardless of investigation needs, and to rely less on on-site support when remote access or live analysis is unavailable. It can thus be used to leverage the already bundled tools and commands during forensic activities.
 
 # Dependencies and Usage
 
@@ -26,9 +26,9 @@
 		* `linpmem-2.1.post4` (64-bit ELF): dumps the memory;
 * `tools-win\`: third-party tools folder for *ir-rescue-win*:
 	* `activ\`: parsing tools for user and system activity artifacts;
+ 		* `exiftool.exe`: parses Link (LNK) files;
  		* `JLECmd.exe`: parses automatic and custom destinations jump lists;
  		* `LastActivityView.exe`: displays a mini-timeline of user and system activity such as logons and logoffs;
- 		* `LECmd.exe`: parses Link (LNK) files;
  		* `rifiuti-vista[64].exe`: parses recycle bin files;
 		* `USBDeview[64].exe`: lists previously and currently connected USB devices;
 	* `ascii\`: text ASCII art files in `*.txt` format;
@@ -147,7 +147,7 @@ events=true
 
 vss=true
 
-# memory 
+# memory
 memory-all=false
 memory-vss=true
 memory-dump=true
@@ -177,13 +177,15 @@ events-txt=true
 
 * **md5deep[64].exe** (v4.4): the [md5deep](http://md5deep.sourceforge.net/ "md5deep Web Site") utility is open-source and is maintained by Jesse Kornblum.
 
-* **LECmd.exe** (v0.9.2.0) and **JLECmd.exe** (v0.9.6.1): [LECmd](https://github.com/EricZimmerman/LECmd "LECmd GitHub Repository") and [JLECmd](https://github.com/EricZimmerman/JLECmd "JLECmd GitHub Repository") are open-source, MIT-licensed parsers for LNK and for automatic and custom destinations jump lists with support for Windows 7 thru Windows 10, respectively. These are developed by Eric Zimmerman and require .NET v4.6.
+* **exiftool.exe** (v10.55)]: [ExifTool](http://owl.phy.queensu.ca/~phil/exiftool/ "ExifTool Web Site") is a free metadata parser and editor of several file formats such as LNK files, authored by Phil Harvey.
+
+* **JLECmd.exe** (v0.9.6.1): [JLECmd](https://github.com/EricZimmerman/JLECmd "JLECmd GitHub Repository") is an open-source, MIT-licensed parser for automatic and custom destinations jump lists with support for Windows 7 thru Windows 10. This utility is developed by Eric Zimmerman and requires .NET v4.6.
 
 * **RawCopy[64].exe** (v1.0.0.15) and **ExtractUsnJrnl[64].exe** (v1.0.0.3): [RawCopy](https://github.com/jschicht/RawCopy "RawCopy GitHub Repository") (essentially, a combination of **ifind** and **icat** from TSK) and [ExtractUsnJrnl](https://github.com/jschicht/ExtractUsnJrnl "ExtractUsnJrnl GitHub Repository") are open-source NTFS utilities to extract data and special files developed by Joakim Schicht.
 
 * **rifiuti-vista[64].exe** (v.0.6.1): [Rifiuti2](https://github.com/abelcheung/rifiuti2 "Rifiuti2 GitHub Repository") is an open-source parser for the recycle bin released under the BSD license.
 
-* **densityscout[64].exe** (build 45): the [DensityScout](https://www.cert.at/downloads/software/densityscout_en.html "DensityScout Web Site") utility to compute entropy was written by Christian Wojner and is released under the ISC license. 
+* **densityscout[64].exe** (build 45): the [DensityScout](https://www.cert.at/downloads/software/densityscout_en.html "DensityScout Web Site") utility to compute entropy was written by Christian Wojner and is released under the ISC license.
 
 * **YARA** (v3.5.0): [YARA](http://virustotal.github.io/yara/ "Yara Web Site") is an open-source signature scheme for malware that can be used to perform scans of specific indicators.
 
@@ -197,8 +199,10 @@ events-txt=true
 
 # Change History
 
+* ***ir-rescue-win-v1.4.3***: process arguments are now filtered from the output of `malware-dlls` into a separate file, replaced `filesystem-table` with a more comprehensive option (`filesystem-info`) that retrieves disk and partition information, swapped [LECmd.exe (v0.9.2.0)](https://github.com/EricZimmerman/LECmd "LECmd GitHub Repository") with [exiftool.exe (v10.55)](http://owl.phy.queensu.ca/~phil/exiftool/ "ExifTool Web Site") for parsing LNK files, and added a few more commands.
+
 * ***ir-rescue-win-v1.4.2***: removed RegRipper (`registry-parse`) (too heavy and best to post-process registry hives).
 
 * ***ir-rescue-win-v1.4.1***: added the collection of application crash dumps (`memory-appdumps`), added the text export and parsing of registry hives (`registry-text` and `registry-parse`), added the dump and parsing of the boot sector (`filesystem-boot` and `filesystem-table`), and made some general improvements.
 
-* ***ir-rescue-win-v1.4.0***: restructured the data collection order and output, extended functionality with configurable options (`outpath`, `rm-glog`, `vss-limit` and `drives-limit`) and added NirSoft `BrowserAddonsView[64].exe` and a less verbose global log file.
+* ***ir-rescue-win-v1.4.0***: restructured the data collection order and output, extended functionality with configurable options (`outpath`, `rm-glog`, `vss-limit` and `drives-limit`), and added NirSoft `BrowserAddonsView[64].exe` and a less verbose global log file.

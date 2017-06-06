@@ -5,6 +5,8 @@
 
 # https://d0hnuts.com/2016/12/21/basics-of-making-a-rootkit-from-syscall-to-hook/
 
+# https://countuponsecurity.com/2017/04/12/intro-to-linux-forensics/
+
 main () {
 	set +vx
 	if [ "$#" -eq 0 ]; then
@@ -509,7 +511,7 @@ init () {
 		it=0
 
 		declare -a -g DFILES=(
-			"/etc/*-release" "/etc/*_version" "/etc/issue" 
+			"/etc/*-release" "/etc/*_version" "/etc/issue"
 			"/proc/*release*" "/proc/*version*"
 		)
 		declare -a -g DISTRO=(
@@ -564,8 +566,8 @@ init () {
 		for i in "${!USERS[@]}"; do
 			tmp="$(echo "${USERS[$i]}" | cut -d : -f 6)"
 			for j in "${FILES[@]}"; do
-				test -e "$tmp/$j" && { 
-					UNPRO+=("${UNAME[$i]}"); UPROF+=("$tmp"); break 1; 
+				test -e "$tmp/$j" && {
+					UNPRO+=("${UNAME[$i]}"); UPROF+=("$tmp"); break 1;
 				}
 			done
 		done
@@ -692,8 +694,8 @@ help () {
 
  Output: text files per each command executed organized according to data type.
 
- ${0##*/}  is a Bash shell script for collecting incident response 
- data on Unix systems.  It uses  third-party  utilities kept in a folder called 
+ ${0##*/}  is a Bash shell script for collecting incident response
+ data on Unix systems.  It uses  third-party  utilities kept in a folder called
  'tools' under 'ir-rescue/tools-nix/'.
 
  Needs root privileges to run.
