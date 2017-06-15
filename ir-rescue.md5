@@ -15,7 +15,7 @@
         36  d7f1f1aeff73a358b65658314a9b599c  ir-rescue\nix\tools-nix\cfg\recursive-md5sum.txt
         61  9b8d6d7a3439bc6d562a09d783f8a13b  ir-rescue\nix\tools-nix\cfg\recursive.txt
    7272696  4a5a922b0c0c2b38131fb4831cc4ece9  ir-rescue\nix\tools-nix\mem\linpmem-2.1.post4
-     20267  f167808d63f943cdce50b9529cbf1123  ir-rescue\README.md
+     20267  ba339a6ef4f3f8246928a22adbf8dca9  ir-rescue\README.md
      74287  f9e6c769d360e5989984c0feca961d4a  ir-rescue\win\ir-rescue-win-v1.4.4.bat
     587776  42badc1d2f03a8b1e4875740d3d49336  ir-rescue\win\tools-win\7za.exe
    8237021  1fd4581f79ebf17b6643381c298677c5  ir-rescue\win\tools-win\activ\exiftool.exe
@@ -66,6 +66,7 @@
     847360  9b41435d4aaacc4b84e35a8b09289caa  ir-rescue\win\tools-win\fs\tsk\libvmdk.dll
      72192  ff980effe50742bc4383c3b652526404  ir-rescue\win\tools-win\fs\tsk\mmcat.exe
      73216  7d783ceac4d92064035bbe2c1e23acc2  ir-rescue\win\tools-win\fs\tsk\mmls.exe
+    440120  d25c3ff7a4cbbffc7c9fff4f659051ce  ir-rescue\win\tools-win\fs\tsk\msvcp140.dll
      83784  a2523ea6950e248cbdf18c9ea1a844f6  ir-rescue\win\tools-win\fs\tsk\vcruntime140.dll
      70144  b0bbe0859a4c4603499aae5e5842fb0f  ir-rescue\win\tools-win\fs\tsk\zlib.dll
     715424  088e659223761e033284ce23cabff819  ir-rescue\win\tools-win\mal\autoruns.exe

@@ -174,7 +174,7 @@ registry-system=true
 
 * **NirSoft**: the [NirSoft](http://www.nirsoft.net/ "NirSoft Web Site") suite of tools are developed by Nir Sofer and are released as freeware utilities. The full list of tools used by *ir-rescue-win* is `AlternateStreamView[64].exe` (v1.51), `BrowserAddonsView[64].exe` (v1.05), `BrowsingHistoryView[64].exe` (v1.86), `ChromeCacheView.exe` (v1.67), `DriverView[64].exe` (v1.47), `iconsext.exe` (v1.47), `IECacheView.exe` (v1.58), `LastActivityView.exe` (v1.16), `MozillaCacheView.exe` (v1.69), `nircmdc[64].exe` (v2.81), `OfficeIns[64].exe` (v1.20), `USBDeview[64].exe` (v2.61), and `WinPrefetchView[64].exe` (v1.35).
 
-* **The Sleuth Kit (TSK)** (v4.4.0): the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is an open-source forensic tool to analyze hard drives at the file system level, used by *ir-rescue-win* to walk the MFT with `fls.exe`, to dump disk boot sectors with `mmcat.exe` and to show disk partition table information with `mmls.exe`.
+* **The Sleuth Kit (TSK)** (v4.4.1): the [TSK](http://www.sleuthkit.org/ "TSK Web Site") is an open-source forensic tool to analyze hard drives at the file system level, used by *ir-rescue-win* to walk the MFT with `fls.exe`, to dump disk boot sectors with `mmcat.exe` and to show disk partition table information with `mmls.exe`.
 
 * **winpmem_1.6.2** (v1.6.2): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue-win* to dump the memory.
 
