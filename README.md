@@ -41,8 +41,10 @@
 	* `cygwin\`: Cygwin tools and Dynamic Linked Libraries (DLLs):
 		* `tr.exe`: used to cut out non-printable characters;
 		* `grep.exe`: used to filter date with regular expressions;
+    * `disk\`: disk tools:
+    	* `EDD.exe`: tests for disk encryption software;
 	* `evt\`: Windows events tools:
-		* `psloglist.exe`;
+		* `psloglist.exe`: extracts Windows event logs;
 	* `fs\`: filesystem tools:
 		* `tsk\`: The Sleuth Kit (TSK) tools and DLLs:
 			* `fls.exe`: walks the Master File Table (MFT);
@@ -113,14 +115,15 @@ The configuration file of each *ir-rescue-win* and *ir-rescue-nix* are mostly co
 
 For *ir-rescue-win*, data is grouped into the types given by the following directives:
 
-* `memory`: this options sets the collection of the memory;
-* `registry`: this option sets the collection of system and user registry;
+* `activity`: this option sets the collection of user activity data;
+* `disk`: this option sets the collection of disk data;
 * `events`: this option sets the collection of Windows event logs;
-* `system`: this option sets the collection of system-related information;
-* `network`: this option sets the collection of network data;
 * `filesystem`: this option sets the collection of data related with NTFS and files;
 * `malware`: this option sets the collection of system data that can be used to spot malware;
-* `activity`: this option sets the collection of user activity data;
+* `memory`: this options sets the collection of the memory;
+* `network`: this option sets the collection of network data;
+* `registry`: this option sets the collection of system and user registry;
+* `system`: this option sets the collection of system-related information;
 * `web`: this option sets the collection of browsing history and caches.
 
 On the one hand, the usage of advanced tools set by the `sigcheck`, `density`, `iconsext` and `yara` options is independent of the configurations made to the collection of data types. On the other hand, directives under the respective main options of the data types are tied to them, meaning that they are disregarded if the main ones are set to `false`. For example, `memory-dump=true`, the option that instructs the tool to dump the Random Access Memory (RAM), is ignored if `memory=false`. The same goes for the `<option>-all` option, which sets all options of a certain data type to `true` for convenience, except `<option>-vss`. The script supports retrieving data from **all available VSS copies** by creating hard links to the copies via the Windows kernel namespace, a feature that can be turned on with `vss=true`. Each of the main options has its own `<option>-vss` option, which enables or disables the acquisition of VSS data for that particular data type. Note that the data collected by the `malware-startup` and `web-(chrome|ie|mozilla)` options is password-protected too, with the password being "infected" without quotes. All options not found or commented in the configuration file are set to `false` during runtime, including the password for the final compressed archive.
@@ -141,11 +144,15 @@ zpassword=infected
 ascii=false
 
 # modules
+events=true
 memory=true
 registry=true
-events=true
 
 vss=true
+
+# events
+events-all=false
+events-txt=true
 
 # memory
 memory-all=false
@@ -157,10 +164,6 @@ memory-pagefile=true
 registry-all=false
 registry-vss=false
 registry-system=true
-
-# events
-events-all=false
-events-txt=true
 ```
 
 # Third-Party Tool List and References
@@ -176,6 +179,8 @@ events-txt=true
 * **winpmem_1.6.2** (v1.6.2): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue-win* to dump the memory.
 
 * **md5deep[64].exe** (v4.4): the [md5deep](http://md5deep.sourceforge.net/ "md5deep Web Site") utility is open-source and is maintained by Jesse Kornblum.
+
+* **EDD.exe** (v2.0.1): the [Encrypted Disk Detector](https://www.magnetforensics.com/free-tool-encrypted-disk-detector/) is a free tool from Magnetic Forensics that tests for specific disk encryption software.
 
 * **exiftool.exe** (v10.55)]: [ExifTool](http://owl.phy.queensu.ca/~phil/exiftool/ "ExifTool Web Site") is a free metadata parser and editor of several file formats such as LNK files, authored by Phil Harvey.
 
@@ -199,6 +204,8 @@ events-txt=true
 
 # Change History
 
+* ***ir-rescue-win-v1.4.4***: moved some `filesystem` options to a new `disk` option that also includes the new `disk-encryption` that tests for a variety of disk encryption software.
+ 
 * ***ir-rescue-win-v1.4.3***: process arguments are now filtered from the output of `malware-dlls` into a separate file, replaced `filesystem-table` with a more comprehensive option (`filesystem-info`) that retrieves disk and partition information, swapped [LECmd.exe (v0.9.2.0)](https://github.com/EricZimmerman/LECmd "LECmd GitHub Repository") with [exiftool.exe (v10.55)](http://owl.phy.queensu.ca/~phil/exiftool/ "ExifTool Web Site") for parsing LNK files, and added a few more commands.
 
 * ***ir-rescue-win-v1.4.2***: removed RegRipper (`registry-parse`) (too heavy and best to post-process registry hives).

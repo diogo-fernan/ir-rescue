@@ -67,6 +67,7 @@
 	call:events
 	call:web
 	call:activity-contd
+	call:disk
 
 	call:sigcheck
 	call:density
@@ -81,15 +82,166 @@
 	endlocal
 	exit /B 0
 
-:memory
-	if %cmem% equ true (if %RUN% equ false mkdir %MEM%)
 
-	if %cmem-dump% equ true (
+:activity
+	if %cactiv-mtl% equ true (
 		if %RUN% equ true (
-			call:header "live memory" "dumping"
-			call:cmd %MEM%\log "%PMEM% -d %TEMPIR%\pmem.tmp %MEM%\raw.mem"
+			call:header "last activity items" "listing"
+			call:cmd %ACTIV%\log "%LAV% /scomma %ACTIV%\mini-timeline.csv"
 		) else (set /A it+=1, itt+=1)
 	)
+	goto:eof
+
+:activity-contd
+	if %cactiv% equ true (if %RUN% equ false mkdir %ACTIV%)
+
+	if %cactiv-usb% equ true (
+		if %RUN% equ true (
+			call:header "USB device history"
+			call:cmd %ACTIV%\log "%USB% /DisplayDisconnected 1 /DisplayNoPortSerial 1 /DisplayNoDriver 1 /RetrieveUSBPower /MarkConnectedDevices 1 /AddExportHeaderLine 1 /sort ~10 /scomma %ACTIV%\usb.csv"
+		) else (set /A it+=1, itt+=1)
+	)
+	if %cactiv-jump% equ true (
+		if %RUN% equ true (
+			call:header "automatic and custom destinations jump lists" "parsing"
+			for /L %%i in (1,1,%ip%) do (
+				call:cmdn %ACTIV%\jump\log "%JLEC% --csv %ACTIV%\jump\!usersp[%%i]! -d !uprofiles[%%i]!\AppData\Roaming\Microsoft\Windows\Recent --dumpTo %ACTIV%\jump\!usersp[%%i]! --fd -q"
+				%JLEC% --csv "%ACTIV%\jump\!usersp[%%i]!" -d "!uprofiles[%%i]!\AppData\Roaming\Microsoft\Windows\Recent" --dumpTo "%ACTIV%\jump\!usersp[%%i]!" --fd -q >> %ACTIV%\jump\log.txt 2>&1
+			)
+		) else (mkdir %ACTIV%\jump & set /A it+=1, itt+=%ip%)
+		if %cactiv-vss% equ true (
+			for /L %%i in (1,1,%ip%) do (
+				if %RUN% equ true (
+					call:cmdn %ACTIV%\jump\log "%JLEC% --csv %ACTIV%\jump\!usersp[%%i]!-vss* -d vss*!uprofiles[%%i]:~2!\AppData\Roaming\Microsoft\Windows\Recent --dumpTo %ACTIV%\jump\!usersp[%%i]!-vss* --fd -q"
+				) else set /A itt+=1
+				for /L %%a in (1,1,%iv%) do (
+					if /I %UPROFILED% equ !vsscd[%%a]! (
+						if %RUN% equ true (
+							%JLEC% --csv "%ACTIV%\jump\!usersp[%%i]!-!vsscf[%%a]!" -d "!vssc[%%a]!!uprofiles[%%i]:~2!\AppData\Roaming\Microsoft\Windows\Recent" --dumpTo "%ACTIV%\jump\!usersp[%%i]!-!vsscf[%%a]!" --fd -q >> %ACTIV%\jump\log.txt 2>&1
+						)
+					)
+				)
+			)
+		)
+	)
+	if %cactiv-lnk% equ true (
+		if %RUN% equ true (
+			call:header "LNK files" "parsing"
+			for /L %%i in (1,1,%ip%) do (
+				call:cmdn %ACTIV%\lnk "%EXIF% -csv !uprofiles[%%i]!\AppData\Roaming\Microsoft\Windows\Recent\*"
+				%EXIF% -csv "!uprofiles[%%i]!\AppData\Roaming\Microsoft\Windows\Recent\*" >> %ACTIV%\lnk.txt 2>&1
+				call:cmdn %ACTIV%\lnk "%EXIF% -csv !ustartup[%%i]!\*"
+				%EXIF% -csv "!ustartup[%%i]!\*" >> %ACTIV%\lnk.txt 2>&1
+			)
+		) else (set /A it+=1, itt+=2*%ip%)
+		if %cactiv-vss% equ true (
+			for /L %%i in (1,1,%ip%) do (
+				if %RUN% equ true (
+					call:cmdn %ACTIV%\lnk "%EXIF% -csv vss*!uprofiles[%%i]:~2!\AppData\Roaming\Microsoft\Windows\Recent"
+					call:cmdn %ACTIV%\lnk "%EXIF% -csv vss*!ustartup[%%i]:~2!"
+				) else set /A itt+=2
+				for /L %%a in (1,1,%iv%) do (
+					if /I %UPROFILED% equ !vsscd[%%a]! (
+						if %RUN% equ true (
+							%EXIF% -csv "!vssc[%%a]!!uprofiles[%%i]:~2!\AppData\Roaming\Microsoft\Windows\Recent" >> %ACTIV%\lnk.txt 2>&1
+							%EXIF% -csv "!vssc[%%a]!!ustartup[%%i]:~2!" >> %ACTIV%\lnk.txt 2>&1
+						)
+					)
+				)
+			)
+		)
+	)
+	if %cactiv-bin% equ true (
+		if %RUN% equ true (call:header "the recycle bin(s)" "parsing") else (set /A it+=1)
+		for /L %%i in (1,1,%iu%) do (
+			for /L %%a in (1,1,%idr%) do (
+				set tmp=!drivesuc[%%a]!:\$Recycle.Bin\!usid[%%i]!
+				if exist !tmp! (
+					if %RUN% equ true (
+						call:cmdn %ACTIV%\bin "%RB% -8 -t , !tmp!"
+						echo  !usid[%%i]! !users[%%i]! >> %ACTIV%\bin.txt 2>&1
+						echo. >> %ACTIV%\bin.txt 2>&1
+						call:cmdr %ACTIV%\bin "%RB% -8 -t , !tmp!"
+					) else set /A itt+=1
+				)
+			)
+		)
+		if %cactiv-vss% equ true (
+			for /L %%i in (1,1,%iu%) do (
+				for /L %%a in (1,1,%iv%) do (
+					set tmp=!vssc[%%a]!\$Recycle.Bin\!usid[%%i]!
+					if exist !tmp! (
+						if %RUN% equ true (
+							call:cmdn %ACTIV%\bin "%RB% -8 -t , !tmp!"
+							echo  !usid[%%i]! !users[%%i]! >> %ACTIV%\bin.txt 2>&1
+							echo. >> %ACTIV%\bin.txt 2>&1
+							call:cmdr %ACTIV%\bin "%RB% -8 -t , !tmp!"
+						) else set /A itt+=1
+					)
+				)
+			)
+		)
+	)
+	goto:eof
+
+:disk
+	if %cdisk% equ true (if %RUN% equ false mkdir %DISK%)
+
+	if %cdisk-info% equ true (
+		if %RUN% equ true (
+			call:header "disk information"
+			set tmp=.diskpart.tmp
+
+			call:cmd %DISK%\disk "diskpart /S %TOOLS%\disk\diskpart-listvol.txt"
+			for /L %%i in (0,1,%idii%) do (
+				echo select disk %%i > !tmp! 2>NUL 2>&1
+				echo list partition >> !tmp! 2>NUL 2>&1
+				call:cmd %DISK%\disk "diskpart /S !tmp!"
+				del /A !tmp! 2>NUL 2>&1
+				call:cmd %DISK%\disk "%MMLS% -Brv !disk[%%i]!"
+			)
+		) else (set /A it+=1, itt+=1+2*%idi%)
+	)
+	if %cdisk-encrypt% equ true (
+		if %RUN% equ true (
+			call:header "for disk encryption" "checking"
+			call:cmd %DISK%\encrypt "%EDD% /accepteula /batch"
+		) else (set /A it+=1, itt+=1)
+	)
+	if %cdisk-boot% equ true (
+		if %RUN% equ true (
+			call:header "disk(s) boot sector" "dumping"
+			for /L %%i in (0,1,%idii%) do (
+				call:cmdn %DISK%\log "%MMCAT% !disk[%%i]! 0"
+				%MMCAT% !disk[%%i]! 0 > %DISK%\boot-%%i.bin 2>&1
+			)
+		) else (set /A it+=1, itt+=%idi%)
+	)
+	goto:eof
+
+:events
+	if %cevt% equ true (if %RUN% equ false mkdir %EVT%)
+
+	if %cevt-evtx% equ true (
+		if %RUN% equ true (
+			call:header "Windows event logs in *.evtx format"
+			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\Security.evtx Security"
+			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\System.evtx System"
+			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\Application.evtx Application"
+			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\Setup.evtx Setup"
+		) else (mkdir %EVT%\evtx & set /A it+=1, itt+=4)
+	)
+	if %cevt-txt% equ true (
+		if %RUN% equ true (
+			call:header "Windows event logs in text format"
+			call:cmd %EVT%\txt\Security "%PLL% -accepteula -s -x Security"
+			call:cmd %EVT%\txt\System "%PLL% -accepteula -s -x System"
+			call:cmd %EVT%\txt\Application "%PLL% -accepteula -s -x Application"
+			call:cmd %EVT%\txt\Setup "%PLL% -accepteula -s -x Setup"
+		) else (mkdir %EVT%\txt & set /A it+=1, itt+=4)
+	)
+	:: call:cmd %EVT%\log ^
+	::	"xcopy %SystemRoot%\System32\winevt\logs\Security.evtx %EVT%\ /C /I /F /H /Y"
 	goto:eof
 
 :filesystem
@@ -125,6 +277,124 @@
 			)
 		) else (set /A it+=1, itt+=%idr%)
 	)
+	goto:eof
+
+:filesystem-contd
+	if %cfs-ntfs% equ true (
+		if %RUN% equ true (
+			call:header "NTFS information"
+			call:cmd %FS%\ntfs "reg query HKLM\SYSTEM\CurrentControlSet\Control\FileSystem /S"
+			call:cmd %FS%\ntfs "fsutil fsinfo drives"
+			for /L %%i in (1,1,%idr%) do (
+				call:cmd %FS%\ntfs "fsutil fsinfo ntfsinfo !drivesuc[%%i]!:\"
+				call:cmd %FS%\ntfs "%NTFS% -accepteula !drivesuc[%%i]!:\"
+			)
+		) else (set /A it+=1, itt+=2+2*%idr%)
+	)
+	if %cfs-vssi% equ true (
+		if %RUN% equ true (
+			call:header "VSS information"
+			call:cmd %FS%\vss "vssadmin list volumes"
+			call:cmd %FS%\vss "vssadmin list shadowstorage"
+			call:cmd %FS%\vss "vssadmin list shadows"
+		) else (set /A it+=1, itt+=3)
+	)
+	if %cfs-dfull% equ true (
+		if %RUN% equ true (
+			call:header "files and directories" "fully listing"
+			call:vssoff
+			for /L %%i in (1,1,%idr%) do (
+				call:cmd %FS%\dir-!driveslc[%%i]!-m "dir /A /O:D /Q /T:W /R /S !drivesuc[%%i]!:\"
+			)
+			call:vsson
+		) else (set /A it+=1, itt+=%idr%)
+		if %cfs-vss% equ true (
+			if %RUN% equ true (
+				for /L %%i in (1,1,%iv%) do (
+					call:cmd %FS%\dir-!vsscf[%%i]!-m "dir /A /O:D /Q /T:W /R /S !vssc[%%i]!\"
+				)
+			) else set /A itt+=%iv%
+		)
+	)
+	if %cfs-dplain% equ true (
+		if %RUN% equ true (
+			call:header "of files and directories" "plain listing"
+			call:vssoff
+			for /L %%i in (1,1,%idr%) do (
+				call:cmd %FS%\dir-!driveslc[%%i]! "dir /A /B /S !drivesuc[%%i]!:\"
+			)
+			call:vsson
+		) else (set /A it+=1, itt+=%idr%)
+		if %cfs-vss% equ true (
+			if %RUN% equ true (
+				for /L %%i in (1,1,%iv%) do (
+					call:cmd %FS%\dir-!vsscf[%%i]! "dir /A /B /S !vssc[%%i]!\"
+				)
+			) else set /A itt+=%iv%
+		)
+	)
+	:: Win32 device namespace (`NamedPipe`)
+	if %cfs-fls% equ true (
+		if %RUN% equ true (
+			call:header "the MFT" "walking"
+			for /L %%i in (1,1,%idr%) do (
+				call:cmd %FS%\fls-!driveslc[%%i]! "%FLS% -l -p -r \\.\!drivesuc[%%i]!:"
+			)
+			call:cmd %FS%\bin "type %FS%\fls-*.txt | findstr /I $Recycle.Bin"
+		) else (set /A it+=1, itt+=%idr%+1)
+	)
+	if %cfs-md5% equ true (
+		if %RUN% equ true (
+			call:header "MD5 values" "computing"
+			call:vssoff
+			call:cmd %FS%\md5-nr "%MD5% -f %CFG%\nonrecursive-md5deep.txt -s -t -z | sort /+67"
+			call:cmd %FS%\md5-r "%MD5% -f %CFG%\recursive-md5deep.txt -r -s -t -z | sort /+67"
+			call:vsson
+		) else (set /A it+=1, itt+=2)
+		if %cfs-vss% equ true (
+			if %RUN% equ false set /A itt+=2*%iv%
+
+			for /L %%i in (1,1,%iv%) do (
+				if %RUN% equ true (
+					call:cmdn %FS%\md5-nr "%MD5% -f %CFG%\nonrecursive-md5deep.txt -s -t -z !vsscf[%%i]! | sort /+67"
+				)
+				for /F %%a in (%CFG%\nonrecursive-md5deep.txt) do (
+				set tmp=%%a
+				set tmpp=!tmp:~0,1!
+					if /I !tmpp! equ !vsscd[%%i]! (
+						if %RUN% equ true (
+							call:cmdr %FS%\md5-nr "%MD5% -s -t -z !vssc[%%i]!!tmp:~2! | sort /+67"
+						)
+					)
+				)
+			)
+			for /L %%i in (1,1,%iv%) do (
+				if %RUN% equ true (
+					call:cmdn %FS%\md5-r "%MD5% -f %CFG%\recursive-md5deep.txt -r -s -t -z !vsscf[%%i]! | sort /+67"
+				)
+				for /F %%a in (%CFG%\recursive-md5deep.txt) do (
+				set tmp=%%a
+				set tmpp=!tmp:~0,1!
+					if /I !tmpp! equ !vsscd[%%i]! (
+						if %RUN% equ true (
+							call:cmdr %FS%\md5-r "%MD5% -r -s -t -z !vssc[%%i]!!tmp:~2! | sort /+67"
+						)
+					)
+				)
+			)
+		)
+	)
+	if %cfs-ads% equ true (
+		if %RUN% equ true (
+			call:header "NTFS ADSs" "listing"
+			for /L %%i in (1,1,%idr%) do (
+				call:cmd %FS%\log "%ADS% /FolderPath !drivesuc[%%i]!:\ /ScanSubfolders 1 /SubFolderDept 0 /ShowZeroLengthStreams 1 /scomma %FS%\ads-!driveslc[%%i]!.csv"
+			)
+		) else (set /A it+=1, itt+=%idr%)
+	)
+	:: "reg query HKLM\SYSTEM\CurrentControlSet\Services\VSS"
+	:: Sysinternals junctions
+	:: Sysinternals streams64.exe -s %SystemDrive% | findstr /C:"Error opening" /V | findstr /C:"The system cannot find the path specified." /V | findstr /R /V "^$"
 	goto:eof
 
 :malware
@@ -175,47 +445,6 @@
 				)
 			)
 		)
-	)
-	goto:eof
-
-:network
-	if %cnet% equ true (if %RUN% equ false mkdir %NET%)
-	:: NirSoft CurrPorts "cports.exe"
-	:: "nmap -sn --traceroute www.google.com"
-	:: nping, ncat
-	:: no portable versions
-	:: "netstat -nr"
-	if %cnet% equ true (
-		if %RUN% equ true (
-			call:header "network data"
-			call:cmd %NET%\ip "ipconfig /all"
-			call:cmd %NET%\ip "ipconfig /displaydns"
-			call:cmd %NET%\conn "netstat -abno"
-			call:cmd %NET%\conn "%TCPV% -accepteula -a -n -c"
-			call:cmd %NET%\netbios "nbtstat -c"
-			call:cmd %NET%\netbios "nbtstat -n"
-			call:cmd %NET%\netbios "nbtstat -S"
-			call:cmd %NET%\tables "route print"
-			call:cmd %NET%\tables "arp -a"
-			call:cmd %NET%\net "net use"
-			call:cmd %NET%\net "net sessions"
-			call:cmd %NET%\net "net view"
-			call:cmd %NET%\shares "net statistics server"
-			call:cmd %NET%\shares "net statistics workstation"
-			call:cmd %NET%\shares "net share"
-			call:cmd %NET%\shares "net files"
-			call:cmd %NET%\shares "openfiles"
-			call:cmd %NET%\shares "%PSF% -accepteula"
-		) else (set /A it+=1, itt+=18)
-	)
-	goto:eof
-
-:activity
-	if %cactiv-mtl% equ true (
-		if %RUN% equ true (
-			call:header "last activity items" "listing"
-			call:cmd %ACTIV%\log "%LAV% /scomma %ACTIV%\mini-timeline.csv"
-		) else (set /A it+=1, itt+=1)
 	)
 	goto:eof
 
@@ -420,163 +649,14 @@
 	)
 	goto:eof
 
-:filesystem-contd
-	if %cfs-info% equ true (
-		if %RUN% equ true (
-			call:header "disk information"
-			set tmp=.diskpart.tmp
+:memory
+	if %cmem% equ true (if %RUN% equ false mkdir %MEM%)
 
-			call:cmd %FS%\disk "diskpart /S %TOOLS%\fs\diskpart-listvol.txt"
-			for /L %%i in (0,1,%idii%) do (
-				echo select disk %%i > !tmp! 2>NUL 2>&1
-				echo list partition >> !tmp! 2>NUL 2>&1
-				call:cmd %FS%\disk "diskpart /S !tmp!"
-				del /A !tmp! 2>NUL 2>&1
-				call:cmd %FS%\disk "%MMLS% -Brv !disk[%%i]!"
-			)
-		) else (set /A it+=1, itt+=1+2*%idi%)
-	)
-	if %cfs-boot% equ true (
+	if %cmem-dump% equ true (
 		if %RUN% equ true (
-			call:header "disk(s) boot sector" "dumping"
-			for /L %%i in (0,1,%idii%) do (
-				call:cmdn %FS%\log "%MMCAT% !disk[%%i]! 0"
-				%MMCAT% !disk[%%i]! 0 > %FS%\boot-%%i.bin 2>&1
-			)
-		) else (set /A it+=1, itt+=%idi%)
-	)
-	if %cfs-ntfs% equ true (
-		if %RUN% equ true (
-			call:header "NTFS information"
-			call:cmd %FS%\ntfs "reg query HKLM\SYSTEM\CurrentControlSet\Control\FileSystem /S"
-			call:cmd %FS%\ntfs "fsutil fsinfo drives"
-			for /L %%i in (1,1,%idr%) do (
-				call:cmd %FS%\ntfs "fsutil fsinfo ntfsinfo !drivesuc[%%i]!:\"
-				call:cmd %FS%\ntfs "%NTFS% -accepteula !drivesuc[%%i]!:\"
-			)
-		) else (set /A it+=1, itt+=2+2*%idr%)
-	)
-	if %cfs-vssi% equ true (
-		if %RUN% equ true (
-			call:header "VSS information"
-			call:cmd %FS%\vss "vssadmin list volumes"
-			call:cmd %FS%\vss "vssadmin list shadowstorage"
-			call:cmd %FS%\vss "vssadmin list shadows"
-		) else (set /A it+=1, itt+=3)
-	)
-	if %cfs-dfull% equ true (
-		if %RUN% equ true (
-			call:header "files and directories" "fully listing"
-			call:vssoff
-			for /L %%i in (1,1,%idr%) do (
-				call:cmd %FS%\dir-!driveslc[%%i]!-m "dir /A /O:D /Q /T:W /R /S !drivesuc[%%i]!:\"
-			)
-			call:vsson
-		) else (set /A it+=1, itt+=%idr%)
-		if %cfs-vss% equ true (
-			if %RUN% equ true (
-				for /L %%i in (1,1,%iv%) do (
-					call:cmd %FS%\dir-!vsscf[%%i]!-m "dir /A /O:D /Q /T:W /R /S !vssc[%%i]!\"
-				)
-			) else set /A itt+=%iv%
-		)
-	)
-	if %cfs-dplain% equ true (
-		if %RUN% equ true (
-			call:header "of files and directories" "plain listing"
-			call:vssoff
-			for /L %%i in (1,1,%idr%) do (
-				call:cmd %FS%\dir-!driveslc[%%i]! "dir /A /B /S !drivesuc[%%i]!:\"
-			)
-			call:vsson
-		) else (set /A it+=1, itt+=%idr%)
-		if %cfs-vss% equ true (
-			if %RUN% equ true (
-				for /L %%i in (1,1,%iv%) do (
-					call:cmd %FS%\dir-!vsscf[%%i]! "dir /A /B /S !vssc[%%i]!\"
-				)
-			) else set /A itt+=%iv%
-		)
-	)
-	:: Win32 device namespace (`NamedPipe`)
-	if %cfs-fls% equ true (
-		if %RUN% equ true (
-			call:header "the MFT" "walking"
-			for /L %%i in (1,1,%idr%) do (
-				call:cmd %FS%\fls-!driveslc[%%i]! "%FLS% -l -p -r \\.\!drivesuc[%%i]!:"
-			)
-			call:cmd %FS%\bin "type %FS%\fls-*.txt | findstr /I $Recycle.Bin"
-		) else (set /A it+=1, itt+=%idr%+1)
-	)
-	if %cfs-md5% equ true (
-		if %RUN% equ true (
-			call:header "MD5 values" "computing"
-			call:vssoff
-			call:cmd %FS%\md5-nr "%MD5% -f %CFG%\nonrecursive-md5deep.txt -s -t -z | sort /+67"
-			call:cmd %FS%\md5-r "%MD5% -f %CFG%\recursive-md5deep.txt -r -s -t -z | sort /+67"
-			call:vsson
-		) else (set /A it+=1, itt+=2)
-		if %cfs-vss% equ true (
-			if %RUN% equ false set /A itt+=2*%iv%
-
-			for /L %%i in (1,1,%iv%) do (
-				if %RUN% equ true (
-					call:cmdn %FS%\md5-nr "%MD5% -f %CFG%\nonrecursive-md5deep.txt -s -t -z !vsscf[%%i]! | sort /+67"
-				)
-				for /F %%a in (%CFG%\nonrecursive-md5deep.txt) do (
-				set tmp=%%a
-				set tmpp=!tmp:~0,1!
-					if /I !tmpp! equ !vsscd[%%i]! (
-						if %RUN% equ true (
-							call:cmdr %FS%\md5-nr "%MD5% -s -t -z !vssc[%%i]!!tmp:~2! | sort /+67"
-						)
-					)
-				)
-			)
-			for /L %%i in (1,1,%iv%) do (
-				if %RUN% equ true (
-					call:cmdn %FS%\md5-r "%MD5% -f %CFG%\recursive-md5deep.txt -r -s -t -z !vsscf[%%i]! | sort /+67"
-				)
-				for /F %%a in (%CFG%\recursive-md5deep.txt) do (
-				set tmp=%%a
-				set tmpp=!tmp:~0,1!
-					if /I !tmpp! equ !vsscd[%%i]! (
-						if %RUN% equ true (
-							call:cmdr %FS%\md5-r "%MD5% -r -s -t -z !vssc[%%i]!!tmp:~2! | sort /+67"
-						)
-					)
-				)
-			)
-		)
-	)
-	if %cfs-ads% equ true (
-		if %RUN% equ true (
-			call:header "NTFS ADSs" "listing"
-			for /L %%i in (1,1,%idr%) do (
-				call:cmd %FS%\log "%ADS% /FolderPath !drivesuc[%%i]!:\ /ScanSubfolders 1 /SubFolderDept 0 /ShowZeroLengthStreams 1 /scomma %FS%\ads-!driveslc[%%i]!.csv"
-			)
-		) else (set /A it+=1, itt+=%idr%)
-	)
-	:: "reg query HKLM\SYSTEM\CurrentControlSet\Services\VSS"
-	:: Sysinternals junctions
-	:: Sysinternals streams64.exe -s %SystemDrive% | findstr /C:"Error opening" /V | findstr /C:"The system cannot find the path specified." /V | findstr /R /V "^$"
-	goto:eof
-
-:network-contd
-	if %cnet% equ true (
-		if %RUN% equ true (
-			call:header "more network data"
-			call:cmd %NET%\intf "netsh interface show interface"
-			call:cmd %NET%\intf "netsh mbn show interface"
-			call:cmd %NET%\intf "netsh bridge show adapter"
-			call:cmd %NET%\intf "netsh interface dump"
-			call:cmd %NET%\intf "netsh bridge dump"
-			call:cmd %NET%\proxy "netsh interface portproxy show all"
-			call:cmd %NET%\conn "ping -a -n 1 %cnet-targ%"
-			call:cmd %NET%\conn "tracert -h 16 -w 256 %cnet-targ%"
-			call:xcp %NET%\log "%SystemRoot%\System32\drivers\etc\hosts" "%NET%\"
-			call:xcp %NET%\log "%SystemRoot%\System32\drivers\etc\lmhosts.sam" "%NET%\"
-		) else (set /A it+=1, itt+=10)
+			call:header "live memory" "dumping"
+			call:cmd %MEM%\log "%PMEM% -d %TEMPIR%\pmem.tmp %MEM%\raw.mem"
+		) else (set /A it+=1, itt+=1)
 	)
 	goto:eof
 
@@ -665,6 +745,129 @@
 	)
 	goto:eof
 
+:network
+	if %cnet% equ true (if %RUN% equ false mkdir %NET%)
+	:: NirSoft CurrPorts "cports.exe"
+	:: "nmap -sn --traceroute www.google.com"
+	:: nping, ncat
+	:: no portable versions
+	:: "netstat -nr"
+	if %cnet% equ true (
+		if %RUN% equ true (
+			call:header "network data"
+			call:cmd %NET%\ip "ipconfig /all"
+			call:cmd %NET%\ip "ipconfig /displaydns"
+			call:cmd %NET%\conn "netstat -abno"
+			call:cmd %NET%\conn "%TCPV% -accepteula -a -n -c"
+			call:cmd %NET%\netbios "nbtstat -c"
+			call:cmd %NET%\netbios "nbtstat -n"
+			call:cmd %NET%\netbios "nbtstat -S"
+			call:cmd %NET%\tables "route print"
+			call:cmd %NET%\tables "arp -a"
+			call:cmd %NET%\net "net use"
+			call:cmd %NET%\net "net sessions"
+			call:cmd %NET%\net "net view"
+			call:cmd %NET%\shares "net statistics server"
+			call:cmd %NET%\shares "net statistics workstation"
+			call:cmd %NET%\shares "net share"
+			call:cmd %NET%\shares "net files"
+			call:cmd %NET%\shares "openfiles"
+			call:cmd %NET%\shares "%PSF% -accepteula"
+		) else (set /A it+=1, itt+=18)
+	)
+	goto:eof
+
+:network-contd
+	if %cnet% equ true (
+		if %RUN% equ true (
+			call:header "more network data"
+			call:cmd %NET%\intf "netsh interface show interface"
+			call:cmd %NET%\intf "netsh mbn show interface"
+			call:cmd %NET%\intf "netsh bridge show adapter"
+			call:cmd %NET%\intf "netsh interface dump"
+			call:cmd %NET%\intf "netsh bridge dump"
+			call:cmd %NET%\proxy "netsh interface portproxy show all"
+			call:cmd %NET%\conn "ping -a -n 1 %cnet-targ%"
+			call:cmd %NET%\conn "tracert -h 16 -w 256 %cnet-targ%"
+			call:xcp %NET%\log "%SystemRoot%\System32\drivers\etc\hosts" "%NET%\"
+			call:xcp %NET%\log "%SystemRoot%\System32\drivers\etc\lmhosts.sam" "%NET%\"
+		) else (set /A it+=1, itt+=10)
+	)
+	goto:eof
+
+:registry
+	if %creg% equ true (if %RUN% equ false mkdir %REG%)
+
+	if %creg-sys% equ true (
+		if %RUN% equ true (
+			call:header "system registry hives"
+			call:cmd %REG%\log "%RCP% /FileNamePath:%SystemRoot%\System32\config\SAM /OutputPath:%REG%\sys"
+			call:cmd %REG%\log "%RCP% /FileNamePath:%SystemRoot%\System32\config\SECURITY /OutputPath:%REG%\sys"
+			call:cmd %REG%\log "%RCP% /FileNamePath:%SystemRoot%\System32\config\SOFTWARE /OutputPath:%REG%\sys"
+			call:cmd %REG%\log "%RCP% /FileNamePath:%SystemRoot%\System32\config\SYSTEM /OutputPath:%REG%\sys"
+			ren %REG%\sys\SAM SAM-live
+			ren %REG%\sys\SECURITY SECURITY-live
+			ren %REG%\sys\SOFTWARE SOFTWARE-live
+			ren %REG%\sys\SYSTEM SYSTEM-live
+		) else (mkdir %REG%\sys & set /A it+=1, itt+=4)
+		if %creg-vss% equ true (
+			for /L %%i in (1,1,%iv%) do (
+				if /I %SYSROOTD% equ !vsscd[%%i]! (
+					if %RUN% equ true (
+						call:cpf %REG%\log "!vssc[%%i]!%SYSROOTP%\System32\config\SAM" "%REG%\sys\SAM-!vsscf[%%i]!"
+						call:cpf %REG%\log "!vssc[%%i]!%SYSROOTP%\System32\config\SECURITY" "%REG%\sys\SECURITY-!vsscf[%%i]!"
+						call:cpf %REG%\log "!vssc[%%i]!%SYSROOTP%\System32\config\SOFTWARE" "%REG%\sys\SOFTWARE-!vsscf[%%i]!"
+						call:cpf %REG%\log "!vssc[%%i]!%SYSROOTP%\System32\config\SYSTEM" "%REG%\sys\SYSTEM-!vsscf[%%i]!"
+					) else set /A itt+=4
+				)
+			)
+		)
+	)
+	if %creg-user% equ true (
+		set /A tmp=0
+		if %RUN% equ true (
+			call:header "user registry hives"
+			for /L %%i in (1,1,%ip%) do (
+				call:cmdn %REG%\log "%RCP% /FileNamePath:!uprofiles[%%i]!\NTUSER.dat /OutputPath:%REG%\user\"
+				%RCP% /FileNamePath:"!uprofiles[%%i]!\NTUSER.dat" /OutputPath:%REG%\user\ >> %REG%\log.txt 2>&1
+				call:cmdn %REG%\log "%RCP% /FileNamePath:!uprofiles[%%i]!\AppData\Local\Microsoft\Windows\UsrClass.dat /OutputPath:%REG%\user\"
+				%RCP% /FileNamePath:"!uprofiles[%%i]!\AppData\Local\Microsoft\Windows\UsrClass.dat" /OutputPath:%REG%\user\ >> %REG%\log.txt 2>&1
+				call:attren "%REG%\user\NTUSER.dat" "NTUSER-!usersp[%%i]!-live.dat"
+				call:attren "%REG%\user\UsrClass.dat" "UsrClass-!usersp[%%i]!-live.dat"
+			)
+		) else (mkdir %REG%\user & set /A it+=1, itt+=2*%ip%, tmp+=%ip%)
+		if %creg-vss% equ true (
+			for /L %%i in (1,1,%ip%) do (
+				for /L %%a in (1,1,%iv%) do (
+					if /I %UPROFILED% equ !vsscd[%%a]! (
+						if %RUN% equ true (
+							call:xcp %REG%\log "!vssc[%%a]!!uprofiles[%%i]:~2!\NTUSER.dat" "%REG%\user"
+							call:attren "%REG%\user\NTUSER.dat" "NTUSER-!usersp[%%i]!-!vsscf[%%a]!.dat"
+							call:xcp %REG%\log "!vssc[%%a]!!uprofiles[%%i]:~2!\AppData\Local\Microsoft\Windows\UsrClass.dat" "%REG%\user"
+							call:attren "%REG%\user\UsrClass.dat" "UsrClass-!usersp[%%i]!-!vsscf[%%a]!.dat"
+						) else (set /A itt+=2, tmp+=1)
+					)
+				)
+			)
+		)
+	)
+	if %creg-text% equ true (
+		if %RUN% equ true (
+			call:header "registry hives" "exporting"
+			call:cmd %REG%\log "reg export HKCR %REG%\txt\hkcr.reg /Y"
+			call:cmd %REG%\log "reg export HKLM %REG%\txt\hklm.reg /Y"
+			call:cmd %REG%\log "reg export HKU %REG%\txt\hku.reg /Y"
+		) else (mkdir %REG%\txt & set /A it+=1, itt+=3)
+	)
+	:: export in text
+	:: for /F "tokens=*" %%p in ('reg query HKU') do (
+	::	set key=%%p
+	::	set key=!key:\=-!.txt
+	::	call:cmd %REG%\log "reg export %%p %REG%\hives\!key!"
+	:: )
+	:: reg save HKLM\key reg.hiv
+	goto:eof
+
 :system
 	if %csys% equ true (if %RUN% equ false mkdir %SYS%)
 
@@ -742,104 +945,6 @@
 	)
 	goto:eof
 
-:registry
-	if %creg% equ true (if %RUN% equ false mkdir %REG%)
-
-	if %creg-sys% equ true (
-		if %RUN% equ true (
-			call:header "system registry hives"
-			call:cmd %REG%\log "%RCP% /FileNamePath:%SystemRoot%\System32\config\SAM /OutputPath:%REG%\sys"
-			call:cmd %REG%\log "%RCP% /FileNamePath:%SystemRoot%\System32\config\SECURITY /OutputPath:%REG%\sys"
-			call:cmd %REG%\log "%RCP% /FileNamePath:%SystemRoot%\System32\config\SOFTWARE /OutputPath:%REG%\sys"
-			call:cmd %REG%\log "%RCP% /FileNamePath:%SystemRoot%\System32\config\SYSTEM /OutputPath:%REG%\sys"
-			ren %REG%\sys\SAM SAM-live
-			ren %REG%\sys\SECURITY SECURITY-live
-			ren %REG%\sys\SOFTWARE SOFTWARE-live
-			ren %REG%\sys\SYSTEM SYSTEM-live
-		) else (mkdir %REG%\sys & set /A it+=1, itt+=4)
-		if %creg-vss% equ true (
-			for /L %%i in (1,1,%iv%) do (
-				if /I %SYSROOTD% equ !vsscd[%%i]! (
-					if %RUN% equ true (
-						call:cpf %REG%\log "!vssc[%%i]!%SYSROOTP%\System32\config\SAM" "%REG%\sys\SAM-!vsscf[%%i]!"
-						call:cpf %REG%\log "!vssc[%%i]!%SYSROOTP%\System32\config\SECURITY" "%REG%\sys\SECURITY-!vsscf[%%i]!"
-						call:cpf %REG%\log "!vssc[%%i]!%SYSROOTP%\System32\config\SOFTWARE" "%REG%\sys\SOFTWARE-!vsscf[%%i]!"
-						call:cpf %REG%\log "!vssc[%%i]!%SYSROOTP%\System32\config\SYSTEM" "%REG%\sys\SYSTEM-!vsscf[%%i]!"
-					) else set /A itt+=4
-				)
-			)
-		)
-	)
-	if %creg-user% equ true (
-		set /A tmp=0
-		if %RUN% equ true (
-			call:header "user registry hives"
-			for /L %%i in (1,1,%ip%) do (
-				call:cmdn %REG%\log "%RCP% /FileNamePath:!uprofiles[%%i]!\NTUSER.dat /OutputPath:%REG%\user\"
-				%RCP% /FileNamePath:"!uprofiles[%%i]!\NTUSER.dat" /OutputPath:%REG%\user\ >> %REG%\log.txt 2>&1
-				call:cmdn %REG%\log "%RCP% /FileNamePath:!uprofiles[%%i]!\AppData\Local\Microsoft\Windows\UsrClass.dat /OutputPath:%REG%\user\"
-				%RCP% /FileNamePath:"!uprofiles[%%i]!\AppData\Local\Microsoft\Windows\UsrClass.dat" /OutputPath:%REG%\user\ >> %REG%\log.txt 2>&1
-				call:attren "%REG%\user\NTUSER.dat" "NTUSER-!usersp[%%i]!-live.dat"
-				call:attren "%REG%\user\UsrClass.dat" "UsrClass-!usersp[%%i]!-live.dat"
-			)
-		) else (mkdir %REG%\user & set /A it+=1, itt+=2*%ip%, tmp+=%ip%)
-		if %creg-vss% equ true (
-			for /L %%i in (1,1,%ip%) do (
-				for /L %%a in (1,1,%iv%) do (
-					if /I %UPROFILED% equ !vsscd[%%a]! (
-						if %RUN% equ true (
-							call:xcp %REG%\log "!vssc[%%a]!!uprofiles[%%i]:~2!\NTUSER.dat" "%REG%\user"
-							call:attren "%REG%\user\NTUSER.dat" "NTUSER-!usersp[%%i]!-!vsscf[%%a]!.dat"
-							call:xcp %REG%\log "!vssc[%%a]!!uprofiles[%%i]:~2!\AppData\Local\Microsoft\Windows\UsrClass.dat" "%REG%\user"
-							call:attren "%REG%\user\UsrClass.dat" "UsrClass-!usersp[%%i]!-!vsscf[%%a]!.dat"
-						) else (set /A itt+=2, tmp+=1)
-					)
-				)
-			)
-		)
-	)
-	if %creg-text% equ true (
-		if %RUN% equ true (
-			call:header "registry hives" "exporting"
-			call:cmd %REG%\log "reg export HKCR %REG%\txt\hkcr.reg /Y"
-			call:cmd %REG%\log "reg export HKLM %REG%\txt\hklm.reg /Y"
-			call:cmd %REG%\log "reg export HKU %REG%\txt\hku.reg /Y"
-		) else (mkdir %REG%\txt & set /A it+=1, itt+=3)
-	)
-	:: export in text
-	:: for /F "tokens=*" %%p in ('reg query HKU') do (
-	::	set key=%%p
-	::	set key=!key:\=-!.txt
-	::	call:cmd %REG%\log "reg export %%p %REG%\hives\!key!"
-	:: )
-	:: reg save HKLM\key reg.hiv
-	goto:eof
-
-:events
-	if %cevt% equ true (if %RUN% equ false mkdir %EVT%)
-
-	if %cevt-evtx% equ true (
-		if %RUN% equ true (
-			call:header "Windows event logs in *.evtx format"
-			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\Security.evtx Security"
-			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\System.evtx System"
-			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\Application.evtx Application"
-			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\Setup.evtx Setup"
-		) else (mkdir %EVT%\evtx & set /A it+=1, itt+=4)
-	)
-	if %cevt-txt% equ true (
-		if %RUN% equ true (
-			call:header "Windows event logs in text format"
-			call:cmd %EVT%\txt\Security "%PLL% -accepteula -s -x Security"
-			call:cmd %EVT%\txt\System "%PLL% -accepteula -s -x System"
-			call:cmd %EVT%\txt\Application "%PLL% -accepteula -s -x Application"
-			call:cmd %EVT%\txt\Setup "%PLL% -accepteula -s -x Setup"
-		) else (mkdir %EVT%\txt & set /A it+=1, itt+=4)
-	)
-	:: call:cmd %EVT%\log ^
-	::	"xcopy %SystemRoot%\System32\winevt\logs\Security.evtx %EVT%\ /C /I /F /H /Y"
-	goto:eof
-
 :web
 	if %cweb% equ true (if %RUN% equ false mkdir %WEB%)
 
@@ -875,97 +980,6 @@
 	)
 	goto:eof
 
-:activity-contd
-	if %cactiv% equ true (if %RUN% equ false mkdir %ACTIV%)
-
-	if %cactiv-usb% equ true (
-		if %RUN% equ true (
-			call:header "USB device history"
-			call:cmd %ACTIV%\log "%USB% /DisplayDisconnected 1 /DisplayNoPortSerial 1 /DisplayNoDriver 1 /RetrieveUSBPower /MarkConnectedDevices 1 /AddExportHeaderLine 1 /sort ~10 /scomma %ACTIV%\usb.csv"
-		) else (set /A it+=1, itt+=1)
-	)
-	if %cactiv-jump% equ true (
-		if %RUN% equ true (
-			call:header "automatic and custom destinations jump lists" "parsing"
-			for /L %%i in (1,1,%ip%) do (
-				call:cmdn %ACTIV%\jump\log "%JLEC% --csv %ACTIV%\jump\!usersp[%%i]! -d !uprofiles[%%i]!\AppData\Roaming\Microsoft\Windows\Recent --dumpTo %ACTIV%\jump\!usersp[%%i]! --fd -q"
-				%JLEC% --csv "%ACTIV%\jump\!usersp[%%i]!" -d "!uprofiles[%%i]!\AppData\Roaming\Microsoft\Windows\Recent" --dumpTo "%ACTIV%\jump\!usersp[%%i]!" --fd -q >> %ACTIV%\jump\log.txt 2>&1
-			)
-		) else (mkdir %ACTIV%\jump & set /A it+=1, itt+=%ip%)
-		if %cactiv-vss% equ true (
-			for /L %%i in (1,1,%ip%) do (
-				if %RUN% equ true (
-					call:cmdn %ACTIV%\jump\log "%JLEC% --csv %ACTIV%\jump\!usersp[%%i]!-vss* -d vss*!uprofiles[%%i]:~2!\AppData\Roaming\Microsoft\Windows\Recent --dumpTo %ACTIV%\jump\!usersp[%%i]!-vss* --fd -q"
-				) else set /A itt+=1
-				for /L %%a in (1,1,%iv%) do (
-					if /I %UPROFILED% equ !vsscd[%%a]! (
-						if %RUN% equ true (
-							%JLEC% --csv "%ACTIV%\jump\!usersp[%%i]!-!vsscf[%%a]!" -d "!vssc[%%a]!!uprofiles[%%i]:~2!\AppData\Roaming\Microsoft\Windows\Recent" --dumpTo "%ACTIV%\jump\!usersp[%%i]!-!vsscf[%%a]!" --fd -q >> %ACTIV%\jump\log.txt 2>&1
-						)
-					)
-				)
-			)
-		)
-	)
-	if %cactiv-lnk% equ true (
-		if %RUN% equ true (
-			call:header "LNK files" "parsing"
-			for /L %%i in (1,1,%ip%) do (
-				call:cmdn %ACTIV%\lnk "%EXIF% -csv !uprofiles[%%i]!\AppData\Roaming\Microsoft\Windows\Recent\*"
-				%EXIF% -csv "!uprofiles[%%i]!\AppData\Roaming\Microsoft\Windows\Recent\*" >> %ACTIV%\lnk.txt 2>&1
-				call:cmdn %ACTIV%\lnk "%EXIF% -csv !ustartup[%%i]!\*"
-				%EXIF% -csv "!ustartup[%%i]!\*" >> %ACTIV%\lnk.txt 2>&1
-			)
-		) else (set /A it+=1, itt+=2*%ip%)
-		if %cactiv-vss% equ true (
-			for /L %%i in (1,1,%ip%) do (
-				if %RUN% equ true (
-					call:cmdn %ACTIV%\lnk "%EXIF% -csv vss*!uprofiles[%%i]:~2!\AppData\Roaming\Microsoft\Windows\Recent"
-					call:cmdn %ACTIV%\lnk "%EXIF% -csv vss*!ustartup[%%i]:~2!"
-				) else set /A itt+=2
-				for /L %%a in (1,1,%iv%) do (
-					if /I %UPROFILED% equ !vsscd[%%a]! (
-						if %RUN% equ true (
-							%EXIF% -csv "!vssc[%%a]!!uprofiles[%%i]:~2!\AppData\Roaming\Microsoft\Windows\Recent" >> %ACTIV%\lnk.txt 2>&1
-							%EXIF% -csv "!vssc[%%a]!!ustartup[%%i]:~2!" >> %ACTIV%\lnk.txt 2>&1
-						)
-					)
-				)
-			)
-		)
-	)
-	if %cactiv-bin% equ true (
-		if %RUN% equ true (call:header "the recycle bin(s)" "parsing") else (set /A it+=1)
-		for /L %%i in (1,1,%iu%) do (
-			for /L %%a in (1,1,%idr%) do (
-				set tmp=!drivesuc[%%a]!:\$Recycle.Bin\!usid[%%i]!
-				if exist !tmp! (
-					if %RUN% equ true (
-						call:cmdn %ACTIV%\bin "%RB% -8 -t , !tmp!"
-						echo  !usid[%%i]! !users[%%i]! >> %ACTIV%\bin.txt 2>&1
-						echo. >> %ACTIV%\bin.txt 2>&1
-						call:cmdr %ACTIV%\bin "%RB% -8 -t , !tmp!"
-					) else set /A itt+=1
-				)
-			)
-		)
-		if %cactiv-vss% equ true (
-			for /L %%i in (1,1,%iu%) do (
-				for /L %%a in (1,1,%iv%) do (
-					set tmp=!vssc[%%a]!\$Recycle.Bin\!usid[%%i]!
-					if exist !tmp! (
-						if %RUN% equ true (
-							call:cmdn %ACTIV%\bin "%RB% -8 -t , !tmp!"
-							echo  !usid[%%i]! !users[%%i]! >> %ACTIV%\bin.txt 2>&1
-							echo. >> %ACTIV%\bin.txt 2>&1
-							call:cmdr %ACTIV%\bin "%RB% -8 -t , !tmp!"
-						) else set /A itt+=1
-					)
-				)
-			)
-		)
-	)
-	goto:eof
 
 :sigcheck
 	if %csigcheck% equ true (if %RUN% equ false (mkdir %MAL% & set /A it+=1))
@@ -1057,6 +1071,7 @@
 		) else set /A itt+=2
 	)
 	goto:eof
+
 
 :header <msg> <term>
 	call:datetm
@@ -1194,6 +1209,7 @@
 	set CCV=%TOOLS%\web\ChromeCacheView.exe
 	set DS=%TOOLS%\mal\densityscout.exe
 	set DV=%TOOLS%\mal\DriverView.exe
+	set EDD=%TOOLS%\disk\EDD.exe
 	set EUJ=%TOOLS%\fs\ExtractUsnJrnl.exe
 	set EXIF=%TOOLS%\activ\exiftool.exe
 	set FLS=%TOOLS%\fs\tsk\fls.exe
@@ -1374,6 +1390,13 @@
 		call:rconff activity-lnk cactiv-lnk !cactiv-all! !cactiv!
 		call:rconff activity-bin cactiv-bin !cactiv-all! !cactiv!
 
+		call:rconf disk cdisk
+		call:rconf disk-all cdisk-all
+		if !cdisk! equ false set cdisk-all=false
+		call:rconff disk-info cdisk-info !cdisk-all! !cdisk!
+		call:rconff disk-encryption cdisk-encrypt !cdisk-all! !cdisk!
+		call:rconff disk-boot cdisk-boot !cdisk-all! !cdisk!
+
 		call:rconf events cevt
 		call:rconf events-all cevt-all
 		if !cevt! equ false set cevt-all=false
@@ -1384,8 +1407,6 @@
 		call:rconf filesystem-all cfs-all
 		if !cfs! equ false set cfs-all=false
 		call:rconff filesystem-vss cfs-vss !cfs-all! !cfs! !cvss!
-		call:rconff filesystem-info cfs-info !cfs-all! !cfs!
-		call:rconff filesystem-boot cfs-boot !cfs-all! !cfs!
 		call:rconff filesystem-ntfs cfs-ntfs !cfs-all! !cfs!
 		call:rconff filesystem-vss-info cfs-vssi !cfs-all! !cfs!
 		call:rconff filesystem-dir-full cfs-dfull !cfs-all! !cfs!
@@ -1503,14 +1524,15 @@
 		set DATA=!coutpath!\data
 		set ROOT=!DATA!\!SYSDATE!
 		set META=!ROOT!\%NAME%
-		set MEM=!ROOT!\mem
-		set REG=!ROOT!\reg
+		set ACTIV=!ROOT!\activ
+		set DISK=!ROOT!\disk
 		set EVT=!ROOT!\evt
-		set SYS=!ROOT!\sys
-		set NET=!ROOT!\net
 		set FS=!ROOT!\fs
 		set MAL=!ROOT!\mal
-		set ACTIV=!ROOT!\activ
+		set MEM=!ROOT!\mem
+		set NET=!ROOT!\net
+		set REG=!ROOT!\reg
+		set SYS=!ROOT!\sys
 		set WEB=!ROOT!\web
 		set LOG=!META!\%NAME%.log
 
@@ -1562,7 +1584,7 @@
 			)
 		)
 
-		for /F "skip=7 tokens=2" %%i in ('diskpart /S %TOOLS%\fs\diskpart-list.txt 2^>NUL') do (
+		for /F "skip=7 tokens=2" %%i in ('diskpart /S %TOOLS%\disk\diskpart-list.txt 2^>NUL') do (
 			set "disk[!idi!]=\\.\PhysicalDrive%%i"
 			set /A idi+=1, idii+=1
 		)
@@ -1601,20 +1623,21 @@
 		)
 
 		set RUN=false
-		call:memory
-		call:filesystem
-		call:malware
-		call:network
 		call:activity
-		call:malware-contd
-		call:filesystem-contd
-		call:network-contd
-		call:memory-contd
-		call:system
-		call:registry
-		call:events
-		call:web
 		call:activity-contd
+		call:disk
+		call:events
+		call:filesystem
+		call:filesystem-contd
+		call:malware
+		call:memory
+		call:memory-contd
+		call:malware-contd
+		call:network
+		call:network-contd
+		call:registry
+		call:system
+		call:web
 
 		call:sigcheck
 		call:density
