@@ -901,11 +901,11 @@
 			call:cmd %SYS%\acc "net localgroup Guests"
 			call:cmd %SYS%\sid "%PSG% -accepteula \\%COMPUTERNAME%"
 			for /L %%i in (1,1,%iu%) do (
-				net user !users[%%i]! /domain %USERDOMAIN% > NUL 2>&1
+				net user !users[%%i]! /domain > NUL 2>&1
 				if not !errorLevel! equ 0 (
 					call:cmd %SYS%\acc "net user !users[%%i]!"
 				) else (
-					call:cmd %SYS%\acc "net user !users[%%i]! /domain %USERDOMAIN%"
+					call:cmd %SYS%\acc "net user !users[%%i]! /domain"
 				)
 				call:cmd %SYS%\sid "%PSG% -accepteula !usid[%%i]!"
 			)
