@@ -8,7 +8,7 @@
 
 *ir-rescue* is designed to group data collections according to data type. For example, all data that relates to networking, such as open file shares and Transmission Control Protocol (TCP) connections, is grouped together, while running processes, services and tasks are gathered under malware. The acquisition of data types and other general options are specified in a simple **configuration file**. It should be noted that the scripts launch a great number of commands and tools, thereby leaving a considerable **footprint** (*e.g.*, strings in the memory, prefetch files, program execution caches) on the system. The runtime varies depending on the computation power, disk write throughput and configurations set. Disk performance is especially important if secure deletion is set and when dumping 64-bit memory (usually 8 GB in size), which can take a considerable amount of time.
 
-*ir-rescue* has been written for incident response and forensic analysts, as well as for security practitioners alike. It represents an effort to streamline host data collection, regardless of investigation needs, and to rely less on on-site support when remote access or live analysis is unavailable. It can thus be used to leverage the already bundled tools and commands during forensic activities.
+*ir-rescue* has been written for incident response and forensic analysts, as well as for security practitioners alike, and is used in companies such as Cisco, PepsiCo and Praetorian. It represents an effort to streamline host data collection, regardless of investigation needs, and to rely less on on-site support when remote access or live analysis is unavailable. It can thus be used to leverage the already bundled tools and commands during forensic activities.
 
 # Dependencies and Usage
 
@@ -207,7 +207,7 @@ registry-system=true
 # Change History
 
 * ***ir-rescue-win-v1.4.4***: moved some `filesystem` options to a new `disk` option that also includes the new `disk-encryption` that tests for a variety of disk encryption software.
- 
+
 * ***ir-rescue-win-v1.4.3***: process arguments are now filtered from the output of `malware-dlls` into a separate file, replaced `filesystem-table` with a more comprehensive option (`filesystem-info`) that retrieves disk and partition information, swapped [LECmd.exe (v0.9.2.0)](https://github.com/EricZimmerman/LECmd "LECmd GitHub Repository") with [exiftool.exe (v10.55)](http://owl.phy.queensu.ca/~phil/exiftool/ "ExifTool Web Site") for parsing LNK files, and added a few more commands.
 
 * ***ir-rescue-win-v1.4.2***: removed RegRipper (`registry-parse`) (too heavy and best to post-process registry hives).
