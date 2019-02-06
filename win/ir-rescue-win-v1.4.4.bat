@@ -4,6 +4,8 @@
 	:: start local variable environment
 	setlocal ENABLEDELAYEDEXPANSION
 
+	set BASEDIR=%~dp0
+	
 	:: check for arguments
 	set /A iargs=0
 	for %%i in (%*) do set /A iargs+=1
@@ -133,6 +135,9 @@
 				call:cmdn %ACTIV%\lnk "%EXIF% -csv !ustartup[%%i]!\*"
 				%EXIF% -csv "!ustartup[%%i]!\*" >> %ACTIV%\lnk.txt 2>&1
 			)
+			call:header "Shellbags" "parsing"
+			mkdir %ACTIV%\shellbag
+			call:cmd %ACTIV%\shellbag "%SHL% -d %BASEDIR%\%REG%\user --csv %BASEDIR%\%ACTIV%\shellbag"
 		) else (set /A it+=1, itt+=2*%ip%)
 		if %cactiv-vss% equ true (
 			for /L %%i in (1,1,%ip%) do (
@@ -832,8 +837,16 @@
 				%RCP% /FileNamePath:"!uprofiles[%%i]!\NTUSER.dat" /OutputPath:%REG%\user\ >> %REG%\log.txt 2>&1
 				call:cmdn %REG%\log "%RCP% /FileNamePath:!uprofiles[%%i]!\AppData\Local\Microsoft\Windows\UsrClass.dat /OutputPath:%REG%\user\"
 				%RCP% /FileNamePath:"!uprofiles[%%i]!\AppData\Local\Microsoft\Windows\UsrClass.dat" /OutputPath:%REG%\user\ >> %REG%\log.txt 2>&1
-				call:attren "%REG%\user\NTUSER.dat" "NTUSER-!usersp[%%i]!-live.dat"
-				call:attren "%REG%\user\UsrClass.dat" "UsrClass-!usersp[%%i]!-live.dat"
+				::call:attren "%REG%\user\NTUSER.dat" "NTUSER-!usersp[%%i]!-live.dat"
+				::call:attren "%REG%\user\UsrClass.dat" "UsrClass-!usersp[%%i]!-live.dat"
+				for /f "tokens=* delims=" %%f in ('dir /b/a-d !uprofiles[%%i]!\*.log*') do (
+					call:cmdn %REG%\log "%RCP% /FileNamePath:!uprofiles[%%i]!\%%f /OutputPath:%REG%\user"
+					%RCP% /FileNamePath:"!uprofiles[%%i]!\%%f" /OutputPath:%REG%\user\ >> %REG%\log.txt 2>&1
+				)
+				for /f "tokens=* delims=" %%f in ('dir /b/a-d !uprofiles[%%i]!\AppData\Local\Microsoft\Windows\*.log*') do (
+					call:cmdn %REG%\log "%RCP% /FileNamePath:!uprofiles[%%i]!\AppData\Local\Microsoft\Windows\%%f /OutputPath:%REG%\user"
+					%RCP% /FileNamePath:"!uprofiles[%%i]!\AppData\Local\Microsoft\Windows\%%f" /OutputPath:%REG%\user\ >> %REG%\log.txt 2>&1
+				)
 			)
 		) else (mkdir %REG%\user & set /A it+=1, itt+=2*%ip%, tmp+=%ip%)
 		if %creg-vss% equ true (
@@ -884,6 +897,7 @@
 			call:cmd %SYS%\sys "systeminfo"
 			call:cmd %SYS%\sys "%PSI% -accepteula -h -s -d"
 			call:cmd %SYS%\sys "powercfg /query"
+			call:cmd %SYS%\software "wmic /output:'%SYS%\installed-software.txt' product get name,version,installdate,installlocation"
 		) else (set /A it+=1, itt+=9)
 	)
 	if %csys-acc% equ true (
@@ -1241,6 +1255,7 @@
 	set USB=%TOOLS%\activ\USBDeview.exe
 	set WPV=%TOOLS%\mal\WinPrefetchView.exe
 	set YAR=%TOOLS%\yara\yara32.exe
+	set SHL=%TOOLS%\activ\SBECmd.exe
 	if exist "%PROGRAMFILES(X86)%" (
 		set AC=%TOOLS%\sys\accesschk64.exe
 		set ADS=%TOOLS%\fs\AlternateStreamView64.exe
@@ -1335,6 +1350,7 @@
 	if not exist %WPV%	 (echo.&echo  ERROR: %WPV% not found. & set /A f=1)
 	if not exist %YAR%	 (echo.&echo  ERROR: %YAR% not found. & set /A f=1)
 	if not exist %ZIP%	 (echo.&echo  ERROR: %ZIP% not found. & set /A f=1)
+	if not exist %SHL%	 (echo.&echo  ERROR: %SHL% not found. & set /A f=1)
 
 	if not exist %CFG%\nonrecursive.txt (
 		echo.&echo  ERROR: %CFG%\nonrecursive.txt not found. & set /A f=1
