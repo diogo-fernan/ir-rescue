@@ -230,19 +230,17 @@
 	if %cevt-evtx% equ true (
 		if %RUN% equ true (
 			call:header "Windows event logs in *.evtx format"
-			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\Security.evtx Security"
-			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\System.evtx System"
-			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\Application.evtx Application"
-			call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\Setup.evtx Setup"
+			for /F "delims=" %%e in ('dir /B C:\Windows\System32\winevt\Logs\*') do (
+				call:cmd %EVT%\log "%PLL% -accepteula -g %EVT%\evtx\%%e %%e"
+			)
 		) else (mkdir %EVT%\evtx & set /A it+=1, itt+=4)
 	)
 	if %cevt-txt% equ true (
 		if %RUN% equ true (
 			call:header "Windows event logs in text format"
-			call:cmd %EVT%\txt\Security "%PLL% -accepteula -s -x Security"
-			call:cmd %EVT%\txt\System "%PLL% -accepteula -s -x System"
-			call:cmd %EVT%\txt\Application "%PLL% -accepteula -s -x Application"
-			call:cmd %EVT%\txt\Setup "%PLL% -accepteula -s -x Setup"
+			for /F "delims=" %%e in ('dir /B C:\Windows\System32\winevt\Logs\*') do (
+				call:cmd %EVT%\txt\%%e "%PLL% -accepteula -s -x %%e"
+			)
 		) else (mkdir %EVT%\txt & set /A it+=1, itt+=4)
 	)
 	:: call:cmd %EVT%\log ^
