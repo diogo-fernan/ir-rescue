@@ -436,7 +436,7 @@ init () {
 	echo -e "\n   initializing..."
 	local f=0
 
-	test ! -e "$PMEM" && echo -e "\n ERROR: $PMEM not found" && f=1
+	test ! -e "$AVML" && echo -e "\n ERROR: $AVML not found" && f=1
 	for i in "${RECUF[@]}"; do
 		test ! -e "$CFG/$i" && echo -e "\n ERROR: $CFG/$i not found" && f=1
 	done
