@@ -25,7 +25,7 @@ The descriptions and organization of the toolset are given below, with both 32-b
 		* `recursive-(exec|hidden|md5sum).txt`: executables, hidden files and `md5sum` recursive locations;
 		* `recursive.txt`: recursive locations for multiple tools;
 	* `mem/`: memory tools:
-		* `linpmem-2.1.post4` (64-bit ELF): dumps the memory;
+		* `AVML-0.21` (64-bit ELF): dumps the memory;
 * `tools-win\`: third-party tools folder for *ir-rescue-win*:
 	* `activ\`: parsing tools for user and system activity artifacts;
  		* `exiftool.exe`: parses Link (LNK) files;
@@ -202,7 +202,7 @@ registry-system=true
 
 ## Unix
 
-* **linpmem-2.1.post4** (v2.1.post4): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue-nix* to dump the memory.
+* **AVML-0.21** (Acquire Volatile Memory for Linux): [AVML](https://github.com/microsoft/avml) is an X86_64 userland volatile memory acquisition tool written in Rust, intended to be deployed as a static binary. AVML can be used to acquire memory without knowing the target OS distribution or kernel a priori. No on-target compilation or fingerprinting is needed.
 
 # Change History
 
