@@ -58,7 +58,7 @@ memory () {
 
 	if [ "${cfg[mem-dump]}" == true ]; then
 		if [ "$RUN" -eq 1 ]; then
-			cmd "$MEM/log" "$PMEM --format raw -o $MEM/mem.aff4"
+			cmd "$MEM/log" "$AVML $MEM/mem.lime"
 		else it=$((it+1)); fi
 	fi
 	return 0
@@ -423,7 +423,7 @@ init () {
 	# differentiate GNU find from BSD find
 	STATF="%8i %A (%4a) %m %N %b (%B) %s '%F' '%y' '%x' '%z' '%w' %U (%u) %G (%g)"
 	STATC="stat -c \"$STATF\""
-	PMEM="$TOOLS/mem/linpmem-2.1.post4"
+	AVML="$TOOLS/mem/avml-0.21"
 	declare -a -g RECUF=(
 		"nonrecursive.txt" "recursive.txt"
 		"recursive-exec.txt"
