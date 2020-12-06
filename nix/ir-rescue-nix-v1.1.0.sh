@@ -470,6 +470,11 @@ init () {
 		rconf system-info sys-info "${cfg[sys-all]}" "${cfg[sys]}"
 		rconf system-account sys-acc "${cfg[sys-all]}" "${cfg[sys]}"
 
+		rconf network net
+		rconf network-all net-all
+		test "${cfg[net]}" = false && cfg[net-all]=false
+		rconf network-info net-info "${cfg[net-all]}" "${cfg[net]}"
+
 		rconf filesystem fs
 		rconf filesystem-all fs-all
 		test "${cfg[fs]}" = false && cfg[fs-all]=false
