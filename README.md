@@ -202,7 +202,7 @@ registry-system=true
 
 ## Unix
 
-* **AVML-0.21** (Acquire Volatile Memory for Linux): [AVML](https://github.com/microsoft/avml) is an X86_64 userland volatile memory acquisition tool written in Rust, intended to be deployed as a static binary. AVML can be used to acquire memory without knowing the target OS distribution or kernel a priori. No on-target compilation or fingerprinting is needed.
+* **AVML-0.21** (Acquire Volatile Memory for Linux): [AVML](https://github.com/microsoft/avml) is an X86_64 userland volatile memory acquisition tool written in Rust, intended to be deployed as a static binary. AVML can be used to acquire memory without knowing the target OS distribution or kernel a priori. No on-target compilation or fingerprinting is needed. AVML was compiled [as described](https://github.com/microsoft/avml#building-on-ubuntu), on an Ubuntu 18.04.5 LTS VM. The binary should run on many [systems and kernel versions](https://github.com/microsoft/avml#tested-distributions).
 
 # Change History
 
