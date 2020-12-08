@@ -105,7 +105,7 @@ The descriptions and organization of the toolset are given below, with both 32-b
 *ir-rescue-win* needs to be run under a command line console with **administrator rights** while *ir-rescue-nix* needs to be run under a command line window with **root privileges**. Both require no arguments and make use of a respective configuration file to set desired options. As such, executing the scripts simply needs the issuing of the files as follows:
 
 * `ir-rescue-win-v1.w.x.bat`, or
-* `chmod +x ir-rescue-nix-v1.y.z.sh; ./ir-rescue-nix-v1.y.z.sh`.
+* `./ir-rescue-nix-v1.y.z.sh`.
 
 Some tools that perform recursive searches or scans are set only to recurse on specific folders. This makes the data collection more targeted while taking into account run time performance as the folders specified are likely locations for analysis due to extensive use by malware. The locations for **recursive search** and **non-recursive search** for Windows and Unix systems can be changed at will in the respective text files under the configuration folders. Some of the tools have dedicated files with specific locations in which to and not to recurse. These are named `recursive-<tool>.txt` and `nonrecursive-<tool>.txt`, with `<tool>` being changed to the tool name. Each file must have one **location as full path** per line without trailing backslashes or forward slashes.
 
