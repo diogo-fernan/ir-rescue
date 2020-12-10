@@ -669,10 +669,10 @@ clean () {
 	return 0
 }
 cleanr () {
-	if [ "${cfg[shred]}" == true ]; then
+	if [ "${cfg[cshred]}" == true ]; then
 		# "wipe", "srm"; "shred" is not effective in all filesystems
 		# "smem", "sfill", "sswap"
-		cmdl "$1" 'find '"${@:2}"' -type f -exec shred -uvn 1 {} '\;''
+		cmdl "$1" 'find '"${@:2}"' -type f -exec shred -uvn 1 {} '\\\;''
 	fi
 	cmdl "$1" "rm -rf -- ${@:2}"
 	# cmdl "$1" "rm -rf ${@:2}"
