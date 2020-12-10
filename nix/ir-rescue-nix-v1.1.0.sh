@@ -604,10 +604,10 @@ end () {
 	timestamp
 	msg " compressing data and cleaning up..."
 
-	packf "$MEM/mem.aff4"
+	packf "$MEM/mem.lime"
 	# packd $MEM
 
-	clean "$MEM/mem.aff4"
+	clean "$MEM/mem.lime"
 
 	timestamp
 	ascii
