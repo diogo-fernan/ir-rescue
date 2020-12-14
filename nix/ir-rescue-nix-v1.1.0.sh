@@ -619,7 +619,7 @@ end () {
 	msg "  finishing..."
 
 	cmdl "./$META/$SYSTEM.md5" "find -P . -type f -exec md5sum {} \;"
-	cd "$DATA"; zip -b "$TEMPIR" -r "../$SYSTEM" "$SYSTEM" > "$NUL" 2>&1; cd ..
+	cd "$DATA"; zip -b "$TEMPIR" -r "../$SYSTEM.zip" "$SYSTEM" > "$NUL" 2>&1; cd ..
 	clean "$TEMPIR"
 	# cleann "$DATA"
 
