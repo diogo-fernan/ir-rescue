@@ -25,7 +25,7 @@ The descriptions and organization of the toolset are given below, with both 32-b
 		* `recursive-(exec|hidden|md5sum).txt`: executables, hidden files and `md5sum` recursive locations;
 		* `recursive.txt`: recursive locations for multiple tools;
 	* `mem/`: memory tools:
-		* `linpmem-2.1.post4` (64-bit ELF): dumps the memory;
+		* `AVML-0.21` (64-bit ELF): dumps the memory;
 * `tools-win\`: third-party tools folder for *ir-rescue-win*:
 	* `activ\`: parsing tools for user and system activity artifacts;
  		* `exiftool.exe`: parses Link (LNK) files;
@@ -105,7 +105,7 @@ The descriptions and organization of the toolset are given below, with both 32-b
 *ir-rescue-win* needs to be run under a command line console with **administrator rights** while *ir-rescue-nix* needs to be run under a command line window with **root privileges**. Both require no arguments and make use of a respective configuration file to set desired options. As such, executing the scripts simply needs the issuing of the files as follows:
 
 * `ir-rescue-win-v1.w.x.bat`, or
-* `chmod +x ir-rescue-nix-v1.y.z.sh; ./ir-rescue-nix-v1.y.z.sh`.
+* `./ir-rescue-nix-v1.y.z.sh`.
 
 Some tools that perform recursive searches or scans are set only to recurse on specific folders. This makes the data collection more targeted while taking into account run time performance as the folders specified are likely locations for analysis due to extensive use by malware. The locations for **recursive search** and **non-recursive search** for Windows and Unix systems can be changed at will in the respective text files under the configuration folders. Some of the tools have dedicated files with specific locations in which to and not to recurse. These are named `recursive-<tool>.txt` and `nonrecursive-<tool>.txt`, with `<tool>` being changed to the tool name. Each file must have one **location as full path** per line without trailing backslashes or forward slashes.
 
@@ -202,7 +202,7 @@ registry-system=true
 
 ## Unix
 
-* **linpmem-2.1.post4** (v2.1.post4): the [Pmem](https://github.com/google/rekall "Rekall GitHub Repository") suite is part of the open-source Recall memory analysis framework, used by *ir-rescue-nix* to dump the memory.
+* **AVML-0.21** (Acquire Volatile Memory for Linux): [AVML](https://github.com/microsoft/avml) is an X86_64 userland volatile memory acquisition tool written in Rust, intended to be deployed as a static binary. AVML can be used to acquire memory without knowing the target OS distribution or kernel a priori. No on-target compilation or fingerprinting is needed. AVML was compiled [as described](https://github.com/microsoft/avml#building-on-ubuntu), on an Ubuntu 18.04.5 LTS VM. The binary should run on many [systems and kernel versions](https://github.com/microsoft/avml#tested-distributions).
 
 # Change History
 
