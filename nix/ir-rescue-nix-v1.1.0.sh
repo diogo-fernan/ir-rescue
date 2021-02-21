@@ -86,6 +86,12 @@ log () {
 			cmdl "$LOG/log" "cat ~/.ssh/known_hosts"
 		else it=$((it+1)); fi
 	fi
+        if [ "${cfg[log-journal]}" == true ]; then
+	        if [ "$RUN" -eq 1 ]; then
+                        cmd "$LOGS/journal-exp" "journalctl -o export"
+                        cmd "$LOGS/journal" "journalctl"
+                else it=$((it+1)); fi
+        fi
 	return 0
 }
 system () {
@@ -462,6 +468,7 @@ init () {
 		rconf log-all log-all
 		test "${cfg[log]}" = false && cfg[log-all]=false
 		rconf log-var log-var "${cfg[log-all]}" "${cfg[log]}"
+                rconf log-journal log-journal "${cfg[log-all]}" "${cfg[log]}"
 
 		rconf system sys
 		rconf system-all sys-all
